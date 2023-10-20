@@ -27,7 +27,7 @@
                         <div class="inner">
                             <h3>{{ $sommeTotalTTC }} FCFA</h3>
 
-                            <p>Somme des ventes</p>
+                            <p>Somme des vente</p>
                         </div>
                         <div class="icon">
                             <i class="ion ion-stats-bars"></i>
