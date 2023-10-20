@@ -131,7 +131,7 @@
                                 </tr>
                                 <tr>
                                     <th>Montant dû </th>
-                                    <td>{{ $facture->montantPaye }}</td>
+                                    <td>{{ $facture->montantDu }}</td>
                                 </tr>
                                 @php
                                 $infosAffichees = true; // Marquer que les informations ont été affichées

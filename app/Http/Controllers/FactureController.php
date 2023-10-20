@@ -110,13 +110,14 @@ class FactureController extends Controller
                 $facture->totalHT = $totalHT;
                 $facture->totalTVA = $totalTVA;
                 $facture->totalTTC = $totalTTC;
-                $facture->montantPaye = ($totalTTC - $montant);
+                $facture->montantPaye =  $montant;
                 // Vous pouvez accéder aux propriétés de chaque objet JSON
                 $facture->quantite = $donnee->quantite;
                 $facture->produit= $donnee->produit; // Assurez-vous d'utiliser la bonne clé ici
                 $facture->prix = $donnee->prix;
                 $facture->total = $donnee->total;
                 $facture->code = $code;
+                $facture->montantDu = ($totalTTC - $facture->montantPaye);
                 //dd($facture);
                 // Sauvegardez la facture dans la base de données
                 $facture->save();

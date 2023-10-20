@@ -49,7 +49,12 @@
                                 @if ($factureUnique->mode->modePaiement === 'Espèce')
                                     <span class="badge badge-success">{{ $factureUnique->mode->modePaiement }}</span>
                                 @else
+                                    @if($factureUnique->montantDu === 0)
                                     <span class="badge badge-danger">{{ $factureUnique->mode->modePaiement }}</span>
+                                    <span class="badge badge-success">Soldé</span>
+                                    @else
+                                    <span class="badge badge-danger">{{ $factureUnique->mode->modePaiement }}</span>
+                                    @endif
                                 @endif
                             @endif
                         </td>

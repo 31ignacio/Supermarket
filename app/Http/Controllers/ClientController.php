@@ -9,8 +9,12 @@ use App\Models\Rembourssement;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\Response;
-
+use PDF;
+use Dompdf\Dompdf;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
+
 
 class ClientController extends Controller
 {
@@ -23,6 +27,21 @@ class ClientController extends Controller
         return view('Clients.index',compact('clients'));
     }
 
+
+    public function detailRembourssement(Request $request){
+
+            
+        $code = $request->id2;
+        $remboursementss = Rembourssement::where('facture_id', $code)->get();
+        
+        // if( $remboursementss->items == []){
+        //     return back()->with('success', 'Pas de detail de rembourssement pour cette facture');
+        // }
+        // dd($remboursementss);
+        return view('Clients.voir', compact('remboursementss'));
+
+    }
+    
     
 
     public function detail($client)
@@ -73,26 +92,29 @@ class ClientController extends Controller
         }
     }
 
-    public function rembourssement(Rembourssement $facture, Request $request){
+    public function rembourssement(Rembourssement $rembourssement, Request $request){
 
 
        // dd($request);
-        try {
-            // Obtenir la date du jour
-        $dateDuJour = Carbon::now();
+       $dateDuJour = Carbon::now()->format('Y-m-d H:i:s');
+        try{
+        $rembourssement->date = $dateDuJour;
+        $rembourssement->mode = "Rembourssement";
+        $rembourssement->montant = $request->rembourssement;
+        $rembourssement->facture_id = $request->factureId;
+        $rembourssement->save();
 
-        // Vous pouvez formater la date selon vos besoins
-        $dateFormatee = $dateDuJour->format('Y-m-d H:i:s');
+        $factures = Facture::where('id', $request->factureId)->first();
+        //$facture = Facture::find($request->factureId);
 
-            $facture->date = $dateFormatee;
-            $facture->mode= "Rembourssement";
+        $montantDu = $factures->montantDu;
+       // dd($montantDu);
 
-            $facture->montant = $request->rembourssement;
-            $facture->facture_id = $request->factureId;
+       
+        $resteAPayer = $montantDu - $request->rembourssement;
 
-                ///dd($facture);
-
-            $facture->save();
+        Facture::where('id', $request->factureId)->update(['montantDu' => $resteAPayer]);
+          
 
             return new Response(200);
         } catch (Exception $e) {
@@ -100,6 +122,7 @@ class ClientController extends Controller
             return new Response(500);
         }
     }
+
     public function edit(Client $client)
     {
         return view('Clients.edit', compact('client'));
@@ -133,6 +156,45 @@ class ClientController extends Controller
             return redirect()->route('client.index')->with('success_message', 'Client supprimé avec succès');
         } catch (Exception $e) {
             dd($e);
+        }
+    }
+
+    public function pdf($rembourssement,$code,Request $request)
+    {
+
+        //dd($rembourssement,$code);
+          // Obtenir la date du jour
+          $dateDuJour = Carbon::now();
+
+          // Vous pouvez formater la date selon vos besoins
+          $dateJour = $dateDuJour->format('Y-m-d H:i:s');
+  
+        try {
+            //recuperer tout les information de l'entreprise
+            $remboursementss = Rembourssement::where('facture_id',$rembourssement)->get();
+            // $remboursements = Remboursement::where('facture_id', $remboursement)->get();
+
+           // dd($remboursementss);
+            //$name= $facture['date'];
+          // Chargez la vue Laravel que vous souhaitez convertir en PDF
+        $html = View::make('Clients.rembourssementFacture',compact('remboursementss','code','dateJour'))->render();
+
+
+            // Créez une instance de Dompdf
+        $dompdf = new Dompdf();
+
+        // Chargez le contenu HTML dans Dompdf
+        $dompdf->loadHtml($html);
+
+        // Rendez le PDF
+        $dompdf->render();
+
+        // Téléchargez le PDF
+        return $dompdf->stream('EtatRembourssement .pdf', ['Attachment' => false]);
+
+        } catch (Exception $e) {
+            dd($e);
+            throw new Exception("Une erreur est survenue lors du téléchargement de la liste");
         }
     }
 

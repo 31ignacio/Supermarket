@@ -1,7 +1,19 @@
 @extends('layouts.master2')
 
 @section('content')
+<style>
+    #achats {
+       border-radius: 10px;
+        background-color: #4CAF50; /* Couleur de fond vert plus pur */
+        color: white; /* Couleur du texte en blanc */
+    }
 
+    #dettes{
+         border-radius: 10px;
+        background-color: red; /* Couleur de fond vert plus pur */
+        color: white; /* Couleur du texte en blanc */
+    }
+</style>
     {{-- <span id="client-id" style="display: none;">{{$client}}</span> --}}
 
     <section class="content">
@@ -16,9 +28,24 @@
                         <div class="alert alert-success">{{ Session::get('success_message') }}</div>
                     @endif
 
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Achats</label>
+                                <input type="text" id="achats" class="form-control" style="border-radius:10px;" readonly />
+
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Dettes</label>
+                            <input type="text" id="dettes" class="form-control" style="border-radius:10px;"/>
+
+                        </div>
+
+                    </div><br><br>
+
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Liste des clients</h3>
+                            <h3 class="card-title">Facture client</h3>
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body">
@@ -40,36 +67,31 @@
                                         <tr>
                                             <td>{{ date('d/m/Y', strtotime($client->date)) }}</td>
                                             <td>{{ $client->code }}</td>
-                                            <td>{{ $client->totalTTC }}</td>
-                                            <td>{{ $client->montantPaye }}</td>
+                                            <td class="montant">{{ $client->totalTTC }}</td>
+                                            <td class="montant2">{{$client->montantDu }}</td>
 
                                             <td>
-                                                @if ($client->mode)
-                                                    @if ($client->mode->modePaiement === 'Espèce')
-                                                        <span
-                                                            class="badge-sm badge-success">{{ $client->mode->modePaiement }}</span>
-                                                    @else
-                                                        <span
-                                                            class="badge-sm badge-danger">{{ $client->mode->modePaiement }}</span>
-                                                    @endif
+                                                @if ($client->mode->modePaiement === 'Espèce')
+                                                <span class="badge badge-success">{{ $client->mode->modePaiement }}</span>
+                                            @else
+                                                @if($client->montantDu === 0)
+                                                <span class="badge badge-danger">{{ $client->mode->modePaiement }}</span>
+                                                <span class="badge badge-success">Soldé</span>
                                                 @else
-                                                    <span class="badge-sm badge-warning">Remboursement</span>
+                                                <span class="badge badge-danger">{{ $client->mode->modePaiement }}</span>
                                                 @endif
-
+                                            @endif
 
                                             </td>
                                             <td>
-                                                <a href="" type="button" class="btn-sm btn-info" data-toggle="modal"
-                                                    data-target="#modal-md" onclick="sendClientIdToModal()"
-                                                    data-client-id="{{ $client->id }}">
-                                                    Détail rembourssement
-                                                </a>
-                                                <a href="" type="button" class="btn-sm btn-warning"
-                                                    data-toggle="modal" data-target="#modal-sm"
-                                                    onclick="sendClientIdToModal()" data-client-id="{{ $client->id }}">
-                                                    Remboursement
-                                                </a>
-
+                                                <button type="button" data-key="{{ $client->id }}" onclick="detailRembourssement(event)" class="btn-sm btn-primary voir">Détails rembourssement</button> 
+                                                @if ($client->montantDu != 0)
+                                                    <a href="" type="button" class="btn-sm btn-warning"
+                                                        data-toggle="modal" data-target="#modal-sm"
+                                                        onclick="sendClientIdToModal()" data-client-id="{{ $client->id }}">
+                                                        Remboursement
+                                                    </a>
+                                                @endif
                                             </td>
                                         </tr>
                                     @empty
@@ -108,7 +130,7 @@
                 <div class="modal-body">
 
 
-                    <input type="text" class="form-control" id="rembourssement" name="rembourssement">
+                    <input type="text" class="form-control" id="rembourssement" autocomplete="off" name="rembourssement">
 
 
                     <p id="client-info" name="factureId"></p>
@@ -133,116 +155,15 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3><i>Détails rembourssement</i></h3>
+                    <h3><i>Détails remboursement</i></h3>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" id='annonceModal'>
 
 
-                    <div class="card">
-                        <div class="card-header">
-
-
-                            @php
-                            $clientInfoAffiche = false;
-                        @endphp
-
-                        @foreach($codesFacturesUniques as $client)
-                            @if(!$clientInfoAffiche)
-                                <b>Client : {{ $client->client->nom }} {{$client->client->prenom}}</b>
-                                @php
-                                    $clientInfoAffiche = true;
-                                @endphp
-                            @endif
-                        @endforeach
-
-
-                        </div>
-                        <!-- /.card-header -->
-                        <div class="card-body">
-                            <table id="example1" class="table table-bordered table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>N°Factuure</th>
-                                        <th>Montant</th>
-                                        <th>Mode paiement</th>
-
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @php
-                                        $sommeMontants = 0;
-                                    @endphp
-                                   @forelse ($rembourssements as $remboursement)
-                                   <p id="client-info2" name="factureId" hidden>{{ $remboursement->facture_id }}</p>
-
-                                   @foreach ($codesFacturesUniques as $facture)
-                                   <p id="client-info2" name="factureId" hidden>{{ $facture->id }}</p>
-
-                                       @if ($remboursement->facture->code === $facture->code)
-                                           <tr>
-                                               <td>{{ date('d/m/Y', strtotime($remboursement->date)) }}</td>
-                                               <td>{{ $remboursement->facture->code }}</td>
-                                               <td>{{ $remboursement->montant }}</td>
-                                               <td class="badge badge-warning">{{ $remboursement->mode }}</td>
-                                           </tr>
-                                           @php
-                                               $sommeMontants += $remboursement->montant;
-                                           @endphp
-                                       @endif
-                                   @endforeach
-                               @empty
-                                   <tr>
-                                       <td class="cell text-center" colspan="6">Aucune opération effectuée</td>
-                                   </tr>
-                               @endforelse
-
-                                    @php
-                                    $infosAffichees = false;
-                                @endphp
-
-                                @foreach($codesFacturesUniques as $client)
-                                    @if(!$infosAffichees)
-                                        <tr>
-                                            <td colspan="2" class="cell text-center" style="font-weight: bold;">Montant Dû :</td>
-                                            <td colspan="2" class="cell text-center " style="font-weight: bold;">{{$client->montantPaye}}</td>
-                                            <td></td>
-                                        </tr>
-
-                                    <tr>
-                                        <td colspan="2" class="cell text-center" style="font-weight: bold;">Somme des rembourssement :</td>
-                                        <td colspan="2" class="cell text-center " style="font-weight: bold;">{{ $sommeMontants }}</td>
-                                        <td></td>
-                                    </tr>
-
-                                    <tr>
-                                        <td colspan="2" class="cell text-center" style="font-weight: bold;">Reste à payer:</td>
-
-                                        <td colspan="2" class="cell text-center " style="font-weight: bold;">{{$client->montantPaye  - $sommeMontants}} FCFA</td>
-                                        <td></td>
-                                    </tr>
-
-                                    @php
-                                    $infosAffichees = true; // Marquer que les informations ont été affichées
-                                @endphp
-                            @endif
-                        @endforeach
-
-
-                                </tbody>
-
-                            </table>
-                        </div>
-                        <!-- /.card-body -->
-                    </div>
-
-                    @error('rembourssement')
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
-
+                   
                 </div>
 
 
@@ -252,31 +173,64 @@
         <!-- /.modal-dialog -->
     </div>
 
+    {{-- Voir les details de rembourssement d'un client --}}
+    <script>
 
+        
+        
+        function detailRembourssement(event) {
+            
+            $('#annonceModal').html('')
+            //alert("Ouverture du formulaire d'inscription")
 
+            var id2 = event.target.getAttribute('data-key');
+                //alert(id2)
+            var url=" {{ route ("detailRembourssement")}} ";
+            var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+            var data = {
+                _token: csrfToken,
+                id2
+            };
+            
+            
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: data,
+                success: function (response)
+                { 
+                    
+                    $('#annonceModal').html(response)
+                                $('#modal-md').modal('show')
+                }
+            
+            });
+            
+        };
+
+    </script>
+    {{-- Envoyer l'id du client sur le modal rembourssement --}}
     <script>
         function sendClientIdToModal() {
             // Récupérer l'ID du client depuis la page
             // var clientId = document.getElementById('client-id').innerText;
             var clientId = event.target.getAttribute(
             'data-client-id'); // Récupère l'ID du client depuis l'attribut personnalisé
-            var factureId = parseInt(document.getElementById('client-info2').innerText);
-            document.getElementById('client-info2').value = document.getElementById('client-info2').innerText;
+            var factureId = parseInt(document.getElementById('client-info').innerText);
+            document.getElementById('client-info').value = document.getElementById('client-info').innerText;
 
 
             // Placez l'ID du client dans votre modal
             var modalContent = document.getElementById('client-info');
-            var modalContent2 = document.getElementById('client-info2');
 
             modalContent.innerHTML = clientId;
-            modalContent2.innerHTML = clientId;
 
 
         }
     </script>
 
-
-
+    {{-- Le rembourssement pour un client --}}
     <script>
         function remboursse() {
             // $("#remboursementBtn").click(function() {
@@ -289,7 +243,7 @@
                 // Envoyer l'ID du client au contrôleur Laravel via une requête AJAX
                 $.ajax({
                     type: 'POST',
-                    url: '{{ route('client.rembourssement') }}', // Remplacez "/votre-route" par la route pertinente de votre application
+                    url: "{{ route('client.rembourssement') }}", // Remplacez "/votre-route" par la route pertinente de votre application
                     data: {
                         _token: csrfToken,
 
@@ -325,6 +279,45 @@
             // });
         };
     </script>
+
+    {{-- Pour faire la somme des achats --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let totalAchats = 0;
+            let montants = document.querySelectorAll('#example1 tbody tr .montant');
+
+            montants.forEach(function(montant) {
+                totalAchats += parseFloat(montant.textContent.replace(/\s/g, '').replace(/,/g, '.'));
+            });
+
+            const formattedTotal = totalAchats.toLocaleString('fr-FR', {
+                style: 'currency',
+                currency: 'XOF'
+            });
+
+            document.getElementById('achats').value = formattedTotal;
+        });
+    </script>
+        
+        {{-- Pour faire la somme des dettes --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let totalAchats = 0;
+            let montants = document.querySelectorAll('#example1 tbody tr .montant2');
+
+            montants.forEach(function(montant) {
+                totalAchats += parseFloat(montant.textContent.replace(/\s/g, '').replace(/,/g, '.'));
+            });
+
+            const formattedTotal = totalAchats.toLocaleString('fr-FR', {
+                style: 'currency',
+                currency: 'XOF'
+            });
+
+            document.getElementById('dettes').value = formattedTotal;
+        });
+    </script>
+
 
 
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\FactureController;
 use App\Http\Controllers\ModeController;
 use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\AccueilController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,7 @@ use App\Http\Controllers\StockController;
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/', [AccueilController::class, 'index'])->name('accueil.index');
 
 Route::prefix('client')->group(function () {
     Route::get('/', [ClientController::class, 'index'])->name('client.index');
@@ -31,6 +33,8 @@ Route::prefix('client')->group(function () {
     Route::post('/create', [ClientController::class, 'store'])->name('client.store');
     Route::get('/edit/{client}', [ClientController::class, 'edit'])->name('client.edit');
     Route::put('/update/{client}', [ClientController::class, 'update'])->name('client.update');
+    Route::post('/detailRemb', [ClientController::class, 'detailRembourssement'])->name('detailRembourssement');
+    Route::get('/pdf/{rembourssement}/{code}', [ClientController::class, "pdf"])->name('rembourssement.pdf');
 
     Route::get('/{client}', [ClientController::class, 'delete'])->name('client.delete');
 });

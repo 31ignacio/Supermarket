@@ -111,10 +111,10 @@
 <body>
     <div class="invoice">
         <div class="invoice-header">
-            <h1>Facture</h1>
+            <h1>Facture(Remboursement)</h1>
         </div>
         <div style="position: absolute; top: 100px; right: 20px;">
-            <p><b>Date:</b> {{ date('d/m/Y', strtotime($date)) }}</p>
+            <p><b>Imprimé le:</b>{{ date('d/m/Y', strtotime($dateJour)) }}</p>
             <p><b>Code facture: </b> {{ $code }}</p>
         </div>
 
@@ -130,43 +130,52 @@
                 $infosAffichees = false;
             @endphp
 
-            @foreach ($factures as $facture)
-                @if ($facture->date === $date && $facture->code === $code)
+             @foreach($remboursementss as $remboursements)
+                {{-- @if ($facture->date === $date && $facture->code === $code) --}}
                     @if (!$infosAffichees)
                         <div class="right">
-                            <p><b>À :</b> {{ $facture->client->nom }} {{ $facture->client->prenom }}</p>
-                            <p><b>Téléphone :</b> {{ $facture->client->telephone }}</p>
-                            <p><b>N° IFU :</b> {{ $facture->client->ifu }}</p>
+                            <p><b>À :</b> {{$remboursements->facture->client->nom}} {{$remboursements->facture->client->prenom}} </p>
+                            <p><b>Téléphone :</b> {{$remboursements->facture->client->telephone}}</p>
+                            <p><b>N° IFU :</b> {{$remboursements->facture->client->ifu}}</p>
                         </div>
                         @php
                             $infosAffichees = true; // Marquer que les informations ont été affichées
                         @endphp
-                    @endif
+                    {{-- @endif --}}
                 @endif
             @endforeach
         </div>
         <table class="invoice-items">
             <thead>
                 <tr>
-                    <th>Quantité</th>
-                    <th>Produits</th>
-                    <th>Prix</th>
-                    <th>Totals</th>
+<th>Date</th>
+                                        <th>N°Factuure</th>
+                                        <th>Montant</th>
+                                        <th>Mode paiement</th>
+
 
                 </tr>
             </thead>
-            <tbody>
-                @foreach ($factures as $facture)
-                    @if ($facture->date === $date && $facture->code === $code)
-                        <tr>
-                            <td>{{ $facture->quantite }}</td>
-                            <td>{{ $facture->produit }}</td>
-                            <td>{{ $facture->prix }}</td>
-                            <td>{{ $facture->total }}</td>
-                        </tr>
-                    @endif
-                @endforeach
+                                <tbody>
 
+                                @php
+                                $totalRemboursement = 0;
+                            @endphp
+
+                               @foreach($remboursementss as $remboursements)
+                                    <tr>
+                                        <td>{{ date('d/m/Y', strtotime($remboursements->date)) }}</td>
+                                        <td>{{ $remboursements->facture->code }}</td>
+                                        <td>{{ $remboursements->montant }}</td>
+                                        <td class="badge badge-warning">{{ $remboursements->mode }}</td>
+                                    </tr>
+
+                                    @php
+                                        $totalRemboursement += $remboursements->montant;
+                                    @endphp
+                                @endforeach
+
+                                
             </tbody>
         </table>
         <div class="invoice-total">
@@ -174,21 +183,20 @@
                 $infosAffichees = false;
             @endphp
 
-            @foreach ($factures as $facture)
-                @if ($facture->date === $date && $facture->code === $code)
+            @foreach ($remboursementss as $remboursements)
+                {{-- @if ($facture->date === $date && $facture->code === $code) --}}
                     @if (!$infosAffichees)
                         <div class="left">
-                            <p>Total HT : {{ $facture->totalHT }} FCFA</p>
-                            <p>TVA (20%) : {{ $facture->totalTVA }} FCFA</p>
-                            <p>Total TTC : {{ $facture->totalTTC }} FCFA</p>
+                            <p>Montant dû : {{$remboursements->facture->montantDu}}FCFA</p>
+                            <p>Somme des rembourssements : {{$totalRemboursement }} FCFA</p>
                         </div>
                         <div class="right">
-                            <p>Montant dû : <span class="amount-due">{{ $facture->montantDu }} FCFA</span></p>
+                            <p>Reste à payer : <span class="amount-due">{{$remboursements->facture->montantDu - $totalRemboursement }} FCFA</span></p>
                         </div>
                         @php
                             $infosAffichees = true; // Marquer que les informations ont été affichées
                         @endphp
-                    @endif
+                    {{-- @endif --}}
                 @endif
             @endforeach
         </div>
