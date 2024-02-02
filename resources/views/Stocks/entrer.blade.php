@@ -13,12 +13,13 @@
 
 
             @if (Session::get('success_message'))
-                <div class="alert alert-success">{{ Session::get('success_message') }}</div>
+                <div class="alert alert-success" id="success-message">{{ Session::get('success_message') }}</div>
+                
             @endif
 
           <div class="card">
             <div class="card-header">
-              <h1 class="card-title">Entrés de stocks</h1>
+              <h1 class="card-title">Entrés de stocks(Détail)</h1>
             </div>
             <!-- /.card-header -->
             <div class="card-body">
@@ -64,5 +65,17 @@
     <!-- /.container-fluid -->
   </section>
 
+  
+  <script>
+    // Recherche de l'élément de message de succès
+    var successMessage = document.getElementById('success-message');
+
+    // Masquer le message de succès après 3 secondes (3000 millisecondes)
+    if (successMessage) {
+        setTimeout(function() {
+            successMessage.style.display = 'none';
+        }, 3000);
+    }
+</script>
   @endsection
 

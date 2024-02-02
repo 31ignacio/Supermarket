@@ -18,6 +18,8 @@ return new class extends Migration
             $table->text('mode');
             $table->unsignedBigInteger('facture_id');
             $table->foreign('facture_id')->references('id')->on('factures');
+            $table->unsignedBigInteger('client_id');
+            $table->foreign('client_id')->references('id')->on('clients');
 
             $table->timestamps();
         });

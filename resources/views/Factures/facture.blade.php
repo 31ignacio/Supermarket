@@ -104,7 +104,16 @@
             font-style: italic;
             font-size: 10px;
             color: #555;
+            text-align: center;
         }
+
+        .caissier-name {
+    font-family: 'VotrePoliceExceptionnelle', sans-serif; /* Remplacez 'VotrePoliceExceptionnelle' par le nom de votre police */
+    font-weight: bold; /* Pour rendre le texte en gras */
+    text-decoration: underline; /* Pour souligner le texte */
+    /* Ajoutez d'autres styles CSS selon vos préférences */
+}
+
     </style>
 </head>
 
@@ -120,10 +129,10 @@
 
         <div class="invoice-details">
             <div class="left">
-                <p><b>De :</b> LEONI'S</p>
-                <p><b>Adresse :</b> Godomey/Abomey-Calavi</p>
-                <p><b>Cél : </b>(+229) 62834200</p>
-                <p><b>IFU : </b> 012345678910</p>
+                <p><b>De :</b> {{$info->nom}}</p>
+                <p><b>Adresse :</b> {{$info->adresse}}</p>
+                <p><b>Cél : </b>{{$info->telephone}}</p>
+                <p><b>IFU : </b> {{$info->ifu}}</p>
             </div>
 
             @php
@@ -133,11 +142,21 @@
             @foreach ($factures as $facture)
                 @if ($facture->date === $date && $facture->code === $code)
                     @if (!$infosAffichees)
+                    @if($facture->client != "" )
                         <div class="right">
-                            <p><b>À :</b> {{ $facture->client->nom }} {{ $facture->client->prenom }}</p>
-                            <p><b>Téléphone :</b> {{ $facture->client->telephone }}</p>
-                            <p><b>N° IFU :</b> {{ $facture->client->ifu }}</p>
+                            <p><b class="caissier-name">CLIENT </b> : {{ $facture->client }}</p>
+                            {{-- <p><b>Téléphone :</b> {{ $facture->client->telephone }}</p> --}}
+                            {{-- <p><b>N° IFU :</b> {{ $facture->client->ifu }}</p> --}}
                         </div>
+                    @else
+
+                        <div class="right">
+                            <p><b class="caissier-name">CLIENT </b> : Client </p>
+                            {{-- <p><b>Téléphone :</b> .....</p> --}}
+                            {{-- <p><b>N° IFU :</b> {{ $facture->client->ifu }}</p> --}}
+                        </div>
+                    @endif
+
                         @php
                             $infosAffichees = true; // Marquer que les informations ont été affichées
                         @endphp
@@ -178,12 +197,21 @@
                 @if ($facture->date === $date && $facture->code === $code)
                     @if (!$infosAffichees)
                         <div class="left">
-                            <p>Total HT : {{ $facture->totalHT }} FCFA</p>
-                            <p>TVA (20%) : {{ $facture->totalTVA }} FCFA</p>
-                            <p>Total TTC : {{ $facture->totalTTC }} FCFA</p>
+                            <p><b>Total HT : </b>  {{ $facture->totalHT }} FCFA</p>
+                            <p><b>TVA (%) : </b>  {{ $facture->totalTVA }} FCFA</p>
+                            <p><b>Total TTC : </b>  {{ $facture->totalTTC }} FCFA</p>
+                            <p><b>Montant perçu : </b>  {{ $facture->montantPaye }} FCFA</p>
+                            <p><b>Remise (%) : </b>  {{ $facture->reduction }} %</p>
+                            <p><b>Reliquat :</b>  {{ $facture->montantPaye - $facture->montantFinal }} FCFA</p>
+                            <p><b>Montant payé :</b> <span class="amount-due">{{ $facture->montantFinal }} FCFA</span></p>
+                            {{-- <p><b>Montant final :</b> <span class="amount-due">{{ $facture->user->name }} FCFA</span></p> --}}
+
+
                         </div>
                         <div class="right">
-                            <p>Montant dû : <span class="amount-due">{{ $facture->montantDu }} FCFA</span></p>
+                            <p>
+                                <span class="caissier-name">Caissier(e) </span> <i> : {{ $facture->user->name }}</i>
+                            </p>
                         </div>
                         @php
                             $infosAffichees = true; // Marquer que les informations ont été affichées

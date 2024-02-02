@@ -21,13 +21,13 @@ class EtatController extends Controller
             $query->where('date', '<=', $request->dateFin);
         }
     
-        if ($request->filled('nom')) {
-            $query->whereHas('client', function ($q) use ($request) {
-                $q->where('nom', 'like', '%' . $request->nom . '%');
-            });
+        if ($request->filled('client')) {
+            $query->where('client', 'like', '%' . $request->nom . '%');
         }
+        
     
         $results = $query->groupBy('code')->get();
+        //dd($results);
     
         return view('Etats/index', compact('results'));
     }

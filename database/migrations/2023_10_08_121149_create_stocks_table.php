@@ -14,8 +14,12 @@ return new class extends Migration
         Schema::create('stocks', function (Blueprint $table) {
             $table->id();
             $table->string('libelle');
-            $table->integer('quantite')->nullable();
+            $table->float('quantite')->nullable();
             $table->datetime('date');
+
+            $table->unsignedBigInteger('produitType_id');
+            $table->foreign('produitType_id')->references('id')->on('produit_types')->onDelete('cascade');
+           
             $table->timestamps();
         });
     }

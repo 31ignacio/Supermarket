@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Stock extends Model
 {
     use HasFactory;
+
+    protected $guarded = [''];
+
+
+    public function produitType()
+    {
+        return $this->belongsTo(produitType::class, 'produitType_id');
+    }
 }

@@ -13,10 +13,21 @@ return new class extends Migration
     {
         Schema::create('produits', function (Blueprint $table) {
             $table->id();
-            $table->string('ref');
+            $table->text('code');
             $table->string('libelle');
-            $table->integer('quantite')->nullable();
-            $table->dateTime('date');
+            $table->float('quantite')->nullable();
+            $table->dateTime('dateReception');
+            $table->text('prix');
+            $table->dateTime('dateExpiration');
+            $table->unsignedBigInteger('produitType_id');
+            $table->foreign('produitType_id')->references('id')->on('produit_types')->onDelete('cascade');
+           
+            $table->unsignedBigInteger('emplacement_id');
+            $table->foreign('emplacement_id')->references('id')->on('emplacements')->onDelete('cascade');
+            $table->unsignedBigInteger('categorie_id');
+            $table->foreign('categorie_id')->references('id')->on('categories')->onDelete('cascade');
+            $table->unsignedBigInteger('fournisseur_id');
+            $table->foreign('fournisseur_id')->references('id')->on('fournisseurs')->onDelete('cascade');
 
             $table->timestamps();
         });

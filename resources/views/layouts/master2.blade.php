@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- <meta name="csrf-token" content="{{ csrf_token() }}"> --}}
 
-    <title>Gestion | Stock</title>
+    <title>SUPERMARKET</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
@@ -20,9 +20,40 @@
     <link rel="stylesheet" href="../../../../AD/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="../../../../AD/dist/css/adminlte.min.css">
+
+    <!-- Tempusdominus Bootstrap 4 -->
+  <link rel="stylesheet" href="../../../../AD/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+  
+  <!-- Bootstrap4 Duallistbox -->
+  <link rel="stylesheet" href="../../../../AD/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
+  <!-- BS Stepper -->
+  <link rel="stylesheet" href="../../../../AD/plugins/bs-stepper/css/bs-stepper.min.css">
+   <!-- dropzonejs -->
+   <link rel="stylesheet" href="../../../../AD/plugins/dropzone/min/dropzone.min.css">
+   <!-- Theme style -->
+   <link rel="stylesheet" href="../../../../AD/dist/css/adminlte.min.css">
+ 
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <!-- Select2 -->
   <link rel="stylesheet" href="../../../../AD/plugins/select2/css/select2.min.css">
   <link rel="stylesheet" href="../../../../AD/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+  <link rel="stylesheet" href="../../../../AD/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+  <link rel="stylesheet" href="../../../../AD/plugins/toastr/toastr.min.css">
+  {{-- <link href="https://unpkg.com/toastify-js/src/toastify.css" rel="stylesheet"> --}}
+  <link rel="stylesheet" href="../../../../AD/toastify-js-master/src/toastify.css">
+
+    <style>
+        body {
+            background-image: url('../../../../AD/dist/img/2.jpg');
+            background-size: cover; /* Ajuste la taille de l'image pour couvrir tout l'écran */
+            background-repeat: no-repeat; /* Empêche la répétition de l'image */
+            height: 100vh; /* Assure que la hauteur de la page est égale à la hauteur de l'écran */
+            margin: 0; /* Supprime la marge par défaut du corps du navigateur */
+        }
+
+        /* Ajoutez ici le reste de votre CSS ou du contenu HTML */
+    </style>
 
 </head>
 
@@ -37,13 +68,17 @@
                             class="fas fa-bars"></i></a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a href="{{route("accueil.index")}}" class="nav-link">Accueil</a>
+                    <a href="#" class="nav-link"></a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a href="{{route('client.index')}}" class="nav-link">Clients</a>
+                    <a href="#" class="nav-link"></a>
                 </li>
+
+                
             </ul>
 
+
+            
             
         </nav>
         <!-- /.navbar -->
@@ -53,7 +88,7 @@
             <!-- Brand Logo -->
             <a href="#" class="brand-link">
                 
-                <h1 class="text-center font-weight-light">LEONI'S</h1>
+                <h4 class="text-center font-weight-light">SUPERMARKET</h4>
             </a>
 
             <!-- Sidebar -->
@@ -61,10 +96,13 @@
                 <!-- Sidebar user (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="../../../../AD/dist/img/avatar3.png" class="img-circle elevation-2" alt="User Image">
+                        <img src="../../../../AD/dist/img/avatar.jpeg" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="#" class="d-block">Administrateur</a>
+                        {{-- <a href="#" class="d-block">Admin</a> --}}
+                        <marquee behavior="scroll" direction="left" scrollamount="8">
+                            <span style="color: white">Bienvenue au supermarché</span>
+                        </marquee>                        
                     </div>
                 </div>
 
@@ -90,16 +128,63 @@
 
                         <li class="nav-item">
                             <a href="{{route('accueil.index')}}" class="nav-link">
-                                <i class="nav-icon fas fa-th"></i>
+                                <i class="nav-icon fas fa-home"></i>
                                 <p>
                                     Accueil
                                 </p>
                             </a>
                         </li>
+                        @auth
+                         @if(auth()->user()->role_id === 1)
+                        
+                        {{-- Utilisateurs --}}
+                          <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-shopping-bag"></i>
+
+                                <p>
+                                    Utilisateurs
+                                    <i class="fas fa-angle-left right"></i>
+                                    {{-- <span class="badge badge-info right">6</span> --}}
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.create') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Ajouter un utilisateur</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="{{ route('admin') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Utilisateurs</p>
+                                    </a>
+                                </li>
+
+                                {{-- <li class="nav-item">
+                                    <a href="{{ route('admin2') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Utilisateurs inactifs</p>
+                                    </a>
+                                </li> --}}
+
+
+
+
+
+                            </ul>
+                        </li>
+
+                      @endif
+                      @endauth
                             {{-- Client --}}
                         <li class="nav-item">
                             <a href="#" class="nav-link">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <i class="fas fa-users"></i>
+
                                 <p>
                                     Clients
                                     <i class="right fas fa-angle-left"></i>
@@ -122,10 +207,49 @@
 
                             </ul>
                         </li>
+                        
+                        @auth
+                         @if(auth()->user()->role_id === 1)
+                        
+                            {{-- Fournisseur --}}
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-users"></i>
+
+                                <p>
+                                    Fournisseurs
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('fournisseur.index') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Liste des fournisseurs</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('fournisseur.create') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Ajouter un fournisseur</p>
+                                    </a>
+                                </li>
+
+
+                            </ul>
+                        </li>
+                        @endif
+                        @endauth
+                       
+                        @auth
+                         @if(auth()->user()->role_id === 1 || auth()->user()->role_id === 3)
+                        
+                    
                             {{-- Produit --}}
                         <li class="nav-item">
                             <a href="#" class="nav-link">
-                                <i class="nav-icon fas fa-copy"></i>
+                                <i class="fas fa-shopping-bag"></i>
+
                                 <p>
                                     Produits
                                     <i class="fas fa-angle-left right"></i>
@@ -133,13 +257,7 @@
                                 </p>
                             </a>
                             <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{ route('produit.index') }}" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Liste des produits</p>
-                                    </a>
-                                </li>
-
+                                
                                 <li class="nav-item">
                                     <a href="{{ route('produit.create') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
@@ -147,14 +265,34 @@
                                     </a>
                                 </li>
 
+                                <li class="nav-item">
+                                    <a href="{{ route('produit.index') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Produits en détails</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="{{ route('produit.index2') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Produits en gros</p>
+                                    </a>
+                                </li>
+
+
+
 
 
                             </ul>
                         </li>
+                        @endif
+                        @endauth
+                       
                             {{-- Facture --}}
                         <li class="nav-item">
                             <a href="#" class="nav-link">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <i class="fas fa-file-invoice-dollar"></i>
+
                                 <p>
                                     Factures
                                     <i class="right fas fa-angle-left"></i>
@@ -175,59 +313,109 @@
                                 </li>
 
                             </ul>
-                        </li>
+                        </li> 
                             {{-- Stock --}}
                          <li class="nav-item">
                             <a href="#" class="nav-link">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <i class="fas fa-warehouse"></i>
+
                                 <p>
                                     Gestions Stocks
                                     <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
                             <ul class="nav nav-treeview">
+
                                 <li class="nav-item">
-                                    <a href="{{ route('stock.actuel') }}" class="nav-link">
+                                    <a href="{{ route('stock.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Stocks actuels</p>
+                                        <p>Stocks Détail</p>
                                     </a>
                                 </li>
+                                @auth
+                                @if(auth()->user()->role_id === 1 || auth()->user()->role_id === 3)
+                               
                                 <li class="nav-item">
-                                    <a href="{{ route('stock.sortie') }}" class="nav-link">
+                                    <a href="{{ route('stock.index2') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Sortie de stocks</p>
+                                        <p>Stocks Gros</p>
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('stock.entrer') }}" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Entrés de stocks</p>
-                                    </a>
-                                </li>
+                                @endif
+                                @endauth
+                                
 
                             </ul>
                         </li>
+                        @auth
+                        @if(auth()->user()->role_id === 1)
+                       
                             {{-- Etat --}}
                         <li class="nav-item">
                             <a href="{{route('etat.index')}}" class="nav-link">
-                                <i class="nav-icon fas fa-th"></i>
+                                <i class="fas fa-shopping-cart"></i>
+
                                 <p>
                                     Etats des ventes
-                                    {{-- <span class="right badge badge-danger">New</span> --}}
-                                </p>
-                            </a>
-                        </li>
-                            {{-- Mode --}}
-                        <li class="nav-item">
-                            <a href="{{route('mode.index')}}" class="nav-link">
-                                <i class="nav-icon fas fa-th"></i>
-                                <p>
-                                    Modes
-                                    {{-- <span class="right badge badge-danger">New</span> --}}
                                 </p>
                             </a>
                         </li>
 
+                            {{-- Confirguration --}}
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-shopping-bag"></i>
+
+                                <p>
+                                    Configurations
+                                    <i class="fas fa-angle-left right"></i>
+                                    {{-- <span class="badge badge-info right">6</span> --}}
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('categorie.index') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Catégories</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="{{ route('emplacement.index') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Emplacements</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="{{ route('information') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Information</p>
+                                    </a>
+                                </li>
+
+
+
+
+                            </ul>
+                        </li>
+                        @endif
+                        @endauth
+                        
+
+                            {{-- Deconnexion --}}<br><br>
+                        <li class="nav-item">
+                            <a href="{{route('logout')}}" class="nav-link">
+                                <i class="fas fa-sign-out-alt"></i>
+
+                                <p>
+                                    Me déconnecter
+                                    <span class="right badge badge-danger">off</span>
+                                </p>
+                            </a>
+                        </li>
+                        
+                        
 
                 </nav>
                 <!-- /.sidebar-menu -->
@@ -236,21 +424,24 @@
         </aside>
 
         <!-- Content Wrapper. Contains page content -->
-        <div class="content-wrapper mt-5">
+        <div class="content-wrapper">
             <!-- Content Header (Page header) -->
             
 
             <!-- Main content -->
+            
+            <br>
             @yield('content')
+
             <!-- /.content -->
         </div>
         <!-- /.content-wrapper -->
-        <footer class="main-footer">
+        {{-- <footer class="main-footer">
             <div class="float-right d-none d-sm-block">
                 <b>Version</b> 1.0
             </div>
             <strong>Copyright &copy; 2023 <a href="https://adminlte.io">ARI </a>Technologie</strong>
-        </footer>
+        </footer> --}}
 
         <!-- Control Sidebar -->
         <aside class="control-sidebar control-sidebar-dark">
@@ -261,6 +452,10 @@
     <!-- ./wrapper -->
 
     <!-- jQuery -->
+
+  {{-- Dans votre vue --}}
+  <!-- <script src="{{ asset('js/logout.js') }}"></script> -->
+
     <script src="../../../../AD/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
     <script src="../../../../AD/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -281,12 +476,10 @@
     <script src="../../../../AD/dist/js/adminlte.min.js"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="../../../../AD/dist/js/demo.js"></script>
-
-
-
-
+    <script src="../../../../AD/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <script src="../../../../AD/plugins/toastr/toastr.min.js"></script>
 <!-- Select2 -->
-<script src="../../../../AD/plugins/select2/js/select2.full.min.js"></script>
+    <script src="../../../../AD/plugins/select2/js/select2.full.min.js"></script>
 <!-- Bootstrap4 Duallistbox -->
 <!-- InputMask -->
     <!-- Page specific script -->
@@ -296,7 +489,7 @@
                 "responsive": true,
                 "lengthChange": false,
                 "autoWidth": false,
-                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+                "buttons": ["excel", "pdf","print"]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
             $('#example2').DataTable({
                 "paging": true,
@@ -393,11 +586,11 @@
     })
 
     // DropzoneJS Demo Code Start
-    Dropzone.autoDiscover = false
+   // Dropzone.autoDiscover = false
 
     // Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
     var previewNode = document.querySelector("#template")
-    previewNode.id = ""
+   // previewNode.id = ""
     var previewTemplate = previewNode.parentNode.innerHTML
     previewNode.parentNode.removeChild(previewNode)
 

@@ -6,10 +6,7 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-12">
-          <div class="callout callout-info">
-            <h5><i class="fas fa-info"></i> Note:</h5>
-            This page has been enhanced for printing. Click the print button at the bottom of the invoice to test.
-          </div>
+          
 
 
           <!-- Main content -->
@@ -17,15 +14,15 @@
             <!-- title row -->
             <div class="row">
               <div class="col-12">
-                <h4>
-                  <i class="fas fa-globe"></i> AdminLTE, Inc.
+                <h5>
+                  <i class="fas fa-globe"></i> <b>Leoni's</b>.
                   <small class="float-right">Date: {{ date('d/m/Y', strtotime($date)) }}
                 </small>
-                </h4>
+                </h5>
               </div>
               <!-- /.col -->
             </div>
-            <!-- info row -->
+            <!-- info row --><br>
             <div class="row invoice-info">
               <div class="col-sm-4 invoice-col">
                 @php
@@ -37,10 +34,13 @@
                         @if (!$infosAffichees)
 
                 <address>
-                  <strong>{{$facture->client->nom}}   {{$facture->client->prenom}}</strong><br>
+                  @if($facture->client=== Null)
+                  <strong>Client: Client</strong><br>
+                  @else
+                  <strong>Client : {{$facture->client}}</strong><br>
+                  @endif
 
-                Téléphone :  {{$facture->client->telephone}}<br>
-                N° Ifu :  {{$facture->client->ifu}}<br>
+                {{-- N° Ifu :  {{$facture->client->ifu}}<br> --}}
 
                 </address>
 
@@ -65,7 +65,7 @@
 
             <!-- Table row -->
             <div class="row">
-              <div class="col-12 table-responsive">
+              <div class="col-sm-12 col-md-12 col-lg-12 table-responsive">
                 <table class="table table-striped">
                   <thead>
                   <tr>
@@ -105,7 +105,7 @@
 
               </div>
               <!-- /.col -->
-              <div class="col-6">
+              <div class="col-sm-12 col-md-6">
 
                 <div class="table-responsive">
                   <table class="table">
@@ -130,9 +130,21 @@
                                     <td>{{ $facture->totalTTC }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Montant dû </th>
-                                    <td>{{ $facture->montantDu }}</td>
+                                  <th>Montant perçu </th>
+                                  <td>{{ $facture->montantPaye }}</td>
+                              </tr>
+                                <tr>
+                                    <th>Reliquat </th>
+                                    <td>{{ $facture->montantPaye - $facture->montantFinal}}</td>
                                 </tr>
+                                <tr>
+                                  <th>Remise (%) </th>
+                                  <td>{{ $facture->reduction }}</td>
+                              </tr>
+                              <tr>
+                                <th>Montant payé </th>
+                                <td>{{ $facture->montantFinal}}</td>
+                            </tr>
                                 @php
                                 $infosAffichees = true; // Marquer que les informations ont été affichées
                                 @endphp
@@ -150,7 +162,7 @@
             <!-- this row will not appear when printing -->
             <div class="row no-print">
               <div class="col-12">
-                <a href="invoice-print.html" rel="noopener" target="_blank" class="btn btn-default"><i class="fas fa-print"></i> Print</a>
+                {{-- <a href="invoice-print.html" rel="noopener" target="_blank" class="btn btn-default"><i class="fas fa-print"></i> Print</a> --}}
                 {{-- <button type="button" class="btn btn-success float-right"><i class="far fa-credit-card"></i> Submit
                   Payment
                 </button> --}}
@@ -165,7 +177,7 @@
                             @if (!$infosAffichees)
 
                 <a href="{{ route('facture.pdf', ['facture' => $facture->id, 'date' => $facture->date, 'code' => $facture->code]) }}" class="btn btn-danger float-right" style="margin-right: 5px;">
-                    <i class="fas fa-download"></i> Generate PDF
+                    <i class="fas fa-download"></i> Facture 
                 </a>
 
                 @php

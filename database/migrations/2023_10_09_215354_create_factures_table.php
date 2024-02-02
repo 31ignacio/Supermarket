@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('factures', function (Blueprint $table) {
             $table->id();
-            $table->integer('quantite');
+            $table->float('quantite');
             $table->dateTime('date');
             $table->integer('prix');
             $table->integer('total');
@@ -23,13 +23,17 @@ return new class extends Migration
             $table->integer('totalTTC');
             $table->text('produit');
             $table->integer('montantPaye')->nullable();
-            $table->integer('montantDu')->nullable();
+            $table->integer('reduction')->nullable();
+            $table->integer('montantRendu')->nullable();
+            $table->integer('montantFinal')->nullable();
+            $table->text('client')->nullable();
 
-            $table->unsignedBigInteger('client_id');
-            $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
+            $table->unsignedBigInteger('produitType_id');
+            $table->foreign('produitType_id')->references('id')->on('produit_types')->onDelete('cascade');
 
-            $table->unsignedBigInteger('mode_id');
-            $table->foreign('mode_id')->references('id')->on('mode_paiements');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
             $table->timestamps();
         });
     }

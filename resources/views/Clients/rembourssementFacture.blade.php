@@ -1,3 +1,5 @@
+{{-- Facture pour les remboursement (pdf) --}}
+
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -122,34 +124,33 @@
             <div class="left">
                 <p><b>De :</b> LEONI'S</p>
                 <p><b>Adresse :</b> Godomey/Abomey-Calavi</p>
-                <p><b>Cél : </b>(+229) 62834200</p>
+                <p><b>Cél : </b>(+229) 61-23-37-19 / 96-47-29-07</p>
                 <p><b>IFU : </b> 012345678910</p>
             </div>
 
             @php
-                $infosAffichees = false;
-            @endphp
+            $clientInfoDisplayed = false; // Variable de drapeau pour vérifier si les informations du client ont déjà été affichées
+        @endphp
 
-             @foreach($remboursementss as $remboursements)
-                {{-- @if ($facture->date === $date && $facture->code === $code) --}}
-                    @if (!$infosAffichees)
-                        <div class="right">
-                            <p><b>À :</b> {{$remboursements->facture->client->nom}} {{$remboursements->facture->client->prenom}} </p>
-                            <p><b>Téléphone :</b> {{$remboursements->facture->client->telephone}}</p>
-                            <p><b>N° IFU :</b> {{$remboursements->facture->client->ifu}}</p>
-                        </div>
-                        @php
-                            $infosAffichees = true; // Marquer que les informations ont été affichées
-                        @endphp
-                    {{-- @endif --}}
-                @endif
-            @endforeach
+        @foreach ($remboursementss as $remboursements)
+            <!-- Le reste de votre code pour chaque remboursement -->
+
+            @if (!$clientInfoDisplayed)
+                <!-- Affichez le nom et le prénom du client une seule fois -->
+                <b>Client : {{ $remboursements->facture->client->nom }}
+                    {{ $remboursements->facture->client->prenom }}</b>
+                @php
+                    $clientInfoDisplayed = true; // Marquer que les informations du client ont été affichées
+                @endphp
+            @endif
+        @endforeach
+
         </div>
         <table class="invoice-items">
             <thead>
                 <tr>
-<th>Date</th>
-                                        <th>N°Factuure</th>
+                                        <th>Date</th>
+                                        <th>N°Facture</th>
                                         <th>Montant</th>
                                         <th>Mode paiement</th>
 
@@ -158,23 +159,51 @@
             </thead>
                                 <tbody>
 
-                                @php
-                                $totalRemboursement = 0;
-                            @endphp
-
-                               @foreach($remboursementss as $remboursements)
+                                    @php
+                                    $totalRemboursement = 0;
+                                    $totalMontant =0;
+                                    
+                                @endphp
+                
+                                @foreach ($remboursementss as $remboursements)
                                     <tr>
                                         <td>{{ date('d/m/Y', strtotime($remboursements->date)) }}</td>
                                         <td>{{ $remboursements->facture->code }}</td>
                                         <td>{{ $remboursements->montant }}</td>
                                         <td class="badge badge-warning">{{ $remboursements->mode }}</td>
                                     </tr>
-
+                
                                     @php
                                         $totalRemboursement += $remboursements->montant;
+                                        
                                     @endphp
                                 @endforeach
-
+                
+                               
+                            
+                                @php
+                                $montantPaye=0;
+                                $totalTTC =0;
+                                @endphp
+                        
+                        
+                                @foreach ($codesFacturesUniques as $facture)
+                                @if($facture->mode_id===1)
+                                        <tr style="display: none;">
+                                            <td>{{ $facture->montantPaye }}</td>
+                                            <td>{{ $facture->totalTTC }}</td>
+                                        </tr>
+                        
+                                        @php
+                                            $totalTTC += $facture->totalTTC;
+                                            $montantPaye += $facture->montantPaye;
+                                            
+                                        @endphp
+                                @endif
+                                    @endforeach
+                        
+                
+                
                                 
             </tbody>
         </table>
@@ -187,11 +216,11 @@
                 {{-- @if ($facture->date === $date && $facture->code === $code) --}}
                     @if (!$infosAffichees)
                         <div class="left">
-                            <p>Montant dû : {{$remboursements->facture->montantDu}}FCFA</p>
-                            <p>Somme des rembourssements : {{$totalRemboursement }} FCFA</p>
+                            <p>Montant dû : {{ $totalTTC - $montantPaye}}FCFA</p>
+                            <p>Remboursements : {{$totalRemboursement }} FCFA</p>
                         </div>
                         <div class="right">
-                            <p>Reste à payer : <span class="amount-due">{{$remboursements->facture->montantDu - $totalRemboursement }} FCFA</span></p>
+                            <p>Reste à payer : <span class="amount-due">{{($totalTTC - $montantPaye) - $totalRemboursement}} FCFA</span></p>
                         </div>
                         @php
                             $infosAffichees = true; // Marquer que les informations ont été affichées

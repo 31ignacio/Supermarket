@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Http\Requests\saveClientRequest;
 use Exception;
 use App\Models\Client;
@@ -22,33 +23,77 @@ class ClientController extends Controller
 
     public function index()
     {
-        $clients = Client::paginate(10);
+        $clients = Client::all();
 
-        return view('Clients.index',compact('clients'));
+        return view('Clients.index', compact('clients'));
     }
 
+    public function dette()
+    {
+        $factures = Facture::all();
 
-    public function detailRembourssement(Request $request){
+        // Créez une collection unique en fonction des colonnes code, date, client et totalHT
+        $dettes = $factures->unique(function ($facture) {
+            return $facture->code . $facture->date . $facture->client . $facture->totalHT;
+        })->groupBy('client_id')->map(function ($group) {
+            return [
+                'client' => $group->first()->client, // Assurez-vous que vous avez une relation "client" définie dans votre modèle Facture
+                'montantTotal' => $group->sum('montantDu'), // Changez "totalHT" par le nom correct de la colonne que vous souhaitez cumuler
+            ];
+        })->reject(function ($dette) {
+            return $dette['montantTotal'] === 0;
+        });
 
-            
+        return view('clients.dette', compact('dettes'));
+    }
+
+    public function detailRembourssement(Request $request)
+    {
+
         $code = $request->id2;
-        $remboursementss = Rembourssement::where('facture_id', $code)->get();
-        
-        // if( $remboursementss->items == []){
-        //     return back()->with('success', 'Pas de detail de rembourssement pour cette facture');
-        // }
-        // dd($remboursementss);
-        return view('Clients.voir', compact('remboursementss'));
+        $clientId = $request->ClientId;
 
+       // dd($clientId,$code);
+       //remboursement d'un client par rapport a une facture
+        $remboursementss = Rembourssement::where('facture_id', $code)->get();
+        //Tout les Remboursement d'un client
+       // $remboursementsClient = Rembourssement::where('client_id', $clientId)->get();
+
+        
+        return view('Clients.voir', compact('remboursementss'));
     }
-    
-    
+
+    public function detailRembourssements(Request $request)
+    {
+
+        //$code = $request->id2;
+        $clientId = $request->ClientId;
+
+        //Tout les Remboursement d'un client
+        $remboursementss = Rembourssement::where('client_id', $clientId)->get();
+
+        $factures = Facture::where('client_id', $clientId)->get();
+        //dd($factures);
+        // Créez une collection unique en fonction des colonnes code, date, client et totalHT
+        $codesFacturesUniques = $factures->unique(function ($facture) {
+            return $facture->code . $facture->dette . $facture->client . $facture->totalHT . $facture->mode;
+        });
+
+        //dd($codesFacturesUniques);
+
+
+        
+        return view('Clients.voir2', compact('remboursementss','codesFacturesUniques','clientId'));
+    }
 
     public function detail($client)
     {
 
         $factures = Facture::where('client_id', $client)->get();
         //dd($factures);
+
+        $totalTTCClient = Facture::where('client_id', $client)->sum('montantFinal');
+
 
         $rembourssements = Rembourssement::all();
 
@@ -59,7 +104,7 @@ class ClientController extends Controller
 
         //dd($codesFacturesUniques,$rembourssements);
 
-        return view('Clients.detail', compact('codesFacturesUniques','client','rembourssements'));
+        return view('Clients.detail', compact('codesFacturesUniques', 'client', 'rembourssements','totalTTCClient'));
     }
 
     public function create()
@@ -73,18 +118,13 @@ class ClientController extends Controller
         //Enregistrer un nouveau client
         try {
             $client->nom = $request->nom;
-            $client->prenom = $request->prenom;
-
-            $client->societe = $request->societe;
-
-            $client->sexe = $request->sexe;
+            $client->raisonSociale = $request->societe;
             $client->telephone = $request->telephone;
-
-            $client->ifu = $request->ifu;
+            $client->ville = $request->ville;
 
             $client->save();
 
-           // dd($client);
+            // dd($client);
 
             return redirect()->route('client.index')->with('success_message', 'Client enregistré avec succès');
         } catch (Exception $e) {
@@ -92,31 +132,33 @@ class ClientController extends Controller
         }
     }
 
-    public function rembourssement(Rembourssement $rembourssement, Request $request){
+    public function rembourssement(Rembourssement $rembourssement, Request $request)
+    {
+        /// dd($rembourssement);
+        $dateDuJour = Carbon::now()->format('Y-m-d H:i:s');
+        try {
+            $rembourssement->date = $dateDuJour;
+            $rembourssement->mode = "Remboursement";
+            $rembourssement->montant = $request->rembourssement;
+            $rembourssement->facture_id = $request->factureId;
+            $rembourssement->client_id = $request->ClientId;
+
+               // dd($rembourssement);
+            $rembourssement->save();
 
 
-       // dd($request);
-       $dateDuJour = Carbon::now()->format('Y-m-d H:i:s');
-        try{
-        $rembourssement->date = $dateDuJour;
-        $rembourssement->mode = "Rembourssement";
-        $rembourssement->montant = $request->rembourssement;
-        $rembourssement->facture_id = $request->factureId;
-        $rembourssement->save();
+            //Après le remboursement je modifie le montant dû sur la table Facture
+            $factures = Facture::where('id', $request->factureId)->first();
+            $montantDu = $factures->montantDu;
+            $resteAPayer = $montantDu - $request->rembourssement;
+            Facture::where('id', $request->factureId)->update(['montantDu' => $resteAPayer]);
 
-        $factures = Facture::where('id', $request->factureId)->first();
-        //$facture = Facture::find($request->factureId);
-
-        $montantDu = $factures->montantDu;
-       // dd($montantDu);
-
-       
-        $resteAPayer = $montantDu - $request->rembourssement;
-
-        Facture::where('id', $request->factureId)->update(['montantDu' => $resteAPayer]);
-          
+            $factures = Facture::where('id', $request->factureId)->first();
 
             return new Response(200);
+            //$response = new stdClass();
+           // $response->ClientId = $request->ClientId; // Assigne la valeur de $request->ClientId à la propriété clientId de l'objet response
+            //return response()->json($response);
         } catch (Exception $e) {
             dd($e);
             return new Response(500);
@@ -132,12 +174,10 @@ class ClientController extends Controller
     {
         //Enregistrer un nouveau département
         try {
-            $client->societe = $request->societe;
             $client->nom = $request->nom;
-            $client->prenom = $request->prenom;
-            $client->sexe = $request->sexe;
-            $client->ifu = $request->ifu;
+            $client->raisonSociale = $request->societe;
             $client->telephone = $request->telephone;
+            $client->ville = $request->ville;
 
             $client->update();
 
@@ -159,46 +199,47 @@ class ClientController extends Controller
         }
     }
 
-    public function pdf($rembourssement,$code,Request $request)
+    public function pdf($rembourssement, $code,$clientId, Request $request)
     {
 
-        //dd($rembourssement,$code);
-          // Obtenir la date du jour
-          $dateDuJour = Carbon::now();
+        //dd($clientId);
+        // Obtenir la date du jour
+        $dateDuJour = Carbon::now();
 
-          // Vous pouvez formater la date selon vos besoins
-          $dateJour = $dateDuJour->format('Y-m-d H:i:s');
-  
+        // Vous pouvez formater la date selon vos besoins
+        $dateJour = $dateDuJour->format('Y-m-d H:i:s');
+
         try {
-            //recuperer tout les information de l'entreprise
-            $remboursementss = Rembourssement::where('facture_id',$rembourssement)->get();
-            // $remboursements = Remboursement::where('facture_id', $remboursement)->get();
+           //Tout les Remboursement d'un client
+            $remboursementss = Rembourssement::where('client_id', $clientId)->get();
 
-           // dd($remboursementss);
+            $factures = Facture::where('client_id', $clientId)->get();
+            //dd($factures);
+            // Créez une collection unique en fonction des colonnes code, date, client et totalHT
+            $codesFacturesUniques = $factures->unique(function ($facture) {
+                return $facture->code . $facture->dette . $facture->client . $facture->totalHT . $facture->mode;
+            });
+
+            // dd($remboursementss);
             //$name= $facture['date'];
-          // Chargez la vue Laravel que vous souhaitez convertir en PDF
-        $html = View::make('Clients.rembourssementFacture',compact('remboursementss','code','dateJour'))->render();
+            // Chargez la vue Laravel que vous souhaitez convertir en PDF
+            $html = View::make('Clients.rembourssementFacture', compact('remboursementss','code', 'codesFacturesUniques', 'dateJour'))->render();
 
 
             // Créez une instance de Dompdf
-        $dompdf = new Dompdf();
+            $dompdf = new Dompdf();
 
-        // Chargez le contenu HTML dans Dompdf
-        $dompdf->loadHtml($html);
+            // Chargez le contenu HTML dans Dompdf
+            $dompdf->loadHtml($html);
 
-        // Rendez le PDF
-        $dompdf->render();
+            // Rendez le PDF
+            $dompdf->render();
 
-        // Téléchargez le PDF
-        return $dompdf->stream('EtatRembourssement .pdf', ['Attachment' => false]);
-
+            // Téléchargez le PDF
+            return $dompdf->stream('EtatRembourssement .pdf', ['Attachment' => false]);
         } catch (Exception $e) {
             dd($e);
             throw new Exception("Une erreur est survenue lors du téléchargement de la liste");
         }
     }
-
-
-
-
 }

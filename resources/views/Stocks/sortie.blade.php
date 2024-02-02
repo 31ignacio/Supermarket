@@ -17,7 +17,7 @@
 
           <div class="card">
             <div class="card-header">
-              <h1 class="card-title">Sortie de stock</h1>
+              <h1 class="card-title">Sortie de stock(Détail)</h1>
             </div>
             <!-- /.card-header -->
             <div class="card-body">

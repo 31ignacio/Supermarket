@@ -24,10 +24,8 @@ class saveClientRequest extends FormRequest
         return [
             'telephone' => 'required',
             'nom' => 'required|string',
-            'prenom' => 'required|string',
-            'ifu' => 'required',
-            'societe' => 'required',
-            'sexe' => 'required'
+            'ville' => 'required|string',
+            'societe' => 'required'
         ];
     }
 
@@ -35,10 +33,9 @@ class saveClientRequest extends FormRequest
     {
         return [
             'telephone.required' => 'Le téléphone est requis',
-            'prenom.required' => 'Le prenom est requis',
+            'ville.required' => 'La ville est requis',
             'nom.required' => 'Le nom est requis',
-            'ifu.required' => 'L\'ifu est requis',
-            'sexe.required' => 'La civilité est requis'
+            'societe.required' => 'La rqison sociale est requis'
 
         ];
     }

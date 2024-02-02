@@ -15,7 +15,7 @@
         <b>Client : {{ $remboursements->facture->client->nom }} {{ $remboursements->facture->client->prenom }}</b>
 
         
-        <a href="{{ route('rembourssement.pdf', ['rembourssement' => $remboursements->facture->id, 'code' => $remboursements->facture->code]) }}" class="btn btn-danger float-right" style="margin-right: 5px;">
+        <a href="{{ route('rembourssement.pdf', ['remboursement' => $remboursements->facture->id, 'code' => $remboursements->facture->code]) }}" class="btn btn-danger float-right" style="margin-right: 5px;">
             <i class="fas fa-download"></i> Generate PDF
         </a>
 
@@ -33,7 +33,7 @@
                                 <thead>
                                     <tr>
                                         <th>Date</th>
-                                        <th>N°Factuure</th>
+                                        <th>N°Facture</th>
                                         <th>Montant</th>
                                         <th>Mode paiement</th>
 
@@ -63,23 +63,25 @@
 <div class="row mt-5">
     <div class="col-12">
         <hr>
+
+        <div class="row">
+            <div class="col-4">
+                <div class="font-weight-bold text-center">Remboursements :</div>
+            </div>
+            <div class="col-4">
+                <div class="font-weight-bold text-center"><span style="color:green;margin-right:40px">{{$totalRemboursement }} </span>  Sur <span style="color:red;margin-left:20px;"> {{$remboursements->facture->montantDu + $remboursements->facture->dette + $totalRemboursement}} FCFA</span></div>
+            </div>
+        </div>
         <div class="row">
             <div class="col-4">
                 <div class="font-weight-bold text-center">Montant Dû :</div>
             </div>
             <div class="col-4">
-                <div class="font-weight-bold text-center">{{$remboursements->facture->montantDu}}</div>
+                <div class="font-weight-bold text-center">{{$remboursements->facture->montantDu}} FCFA</div>
             </div>
         </div>
         <hr>
-        <div class="row">
-            <div class="col-4">
-                <div class="font-weight-bold text-center">Somme des remboursements :</div>
-            </div>
-            <div class="col-4">
-                <div class="font-weight-bold text-center">{{$totalRemboursement }}</div>
-            </div>
-        </div>
+       
         <hr>
         {{-- <div class="row">
             <div class="col-4">

@@ -11,16 +11,14 @@ class Facture extends Model
 
     protected $guarded = [''];
 
-
-    public function client()
+public function produitType()
 {
-    return $this->belongsTo(Client::class, 'client_id');
+    return $this->belongsTo(produitType::class, 'produitType_id');
 }
 
-
-    public function mode()
+public function user()
 {
-    return $this->belongsTo(ModePaiement::class, 'mode_id');
+    return $this->belongsTo(user::class, 'user_id');
 }
 
 
