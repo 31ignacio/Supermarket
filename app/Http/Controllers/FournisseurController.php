@@ -57,10 +57,11 @@ class FournisseurController extends Controller
 
         // Décoder la chaîne JSON en tableau associatif
         $data = json_decode($jsonString, true);
+        //dd($data);
 
         // Accéder à la valeur de fournisseur_id
-        $fournisseurId = $data['fournisseur_id'];
-
+        //$fournisseurId = $data['fournisseur_id'];
+        $fournisseurId= $data;
         //dd($fournisseurId);
 
         $fournisseur= new fournisseurInfo();
@@ -72,7 +73,7 @@ class FournisseurController extends Controller
         $fournisseur->save();
         
 
-        return back()->with('success_message', 'Achat a été enregistrée avec succès');
+        return back()->with('success_message', 'Achat enregistré avec succès');
     }
 
     public function storeReglement(Request $request)
@@ -95,7 +96,7 @@ class FournisseurController extends Controller
         $fournisseur->fournisseur_id = $fournisseurId;
         $fournisseur->save();
         
-        return back()->with('success_message', 'Reglement a été enregistrée avec succès');
+        return back()->with('success_message', 'Reglement enregistré avec succès');
     }
 
 

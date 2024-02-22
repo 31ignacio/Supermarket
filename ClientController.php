@@ -35,7 +35,7 @@ class ClientController extends Controller
         // Créez une collection unique en fonction des colonnes code, date, client et totalHT
         $dettes = $factures->unique(function ($facture) {
             return $facture->code . $facture->date . $facture->client . $facture->totalHT;
-        })->groupBy('client')->map(function ($group) {
+        })->groupBy('client_id')->map(function ($group) {
             return [
                 'client' => $group->first()->client, // Assurez-vous que vous avez une relation "client" définie dans votre modèle Facture
                 'montantTotal' => $group->sum('montantDu'), // Changez "totalHT" par le nom correct de la colonne que vous souhaitez cumuler
@@ -57,7 +57,7 @@ class ClientController extends Controller
        //remboursement d'un client par rapport a une facture
         $remboursementss = Rembourssement::where('facture_id', $code)->get();
         //Tout les Remboursement d'un client
-       // $remboursementsClient = Rembourssement::where('client', $clientId)->get();
+       // $remboursementsClient = Rembourssement::where('client_id', $clientId)->get();
 
         
         return view('Clients.voir', compact('remboursementss'));
@@ -70,9 +70,9 @@ class ClientController extends Controller
         $clientId = $request->ClientId;
 
         //Tout les Remboursement d'un client
-        $remboursementss = Rembourssement::where('client', $clientId)->get();
+        $remboursementss = Rembourssement::where('client_id', $clientId)->get();
 
-        $factures = Facture::where('client', $clientId)->get();
+        $factures = Facture::where('client_id', $clientId)->get();
         //dd($factures);
         // Créez une collection unique en fonction des colonnes code, date, client et totalHT
         $codesFacturesUniques = $factures->unique(function ($facture) {
@@ -89,10 +89,10 @@ class ClientController extends Controller
     public function detail($client)
     {
 
-        $factures = Facture::where('client', $client)->get();
+        $factures = Facture::where('client_id', $client)->get();
         //dd($factures);
 
-        $totalTTCClient = Facture::where('client', $client)->sum('montantFinal');
+        $totalTTCClient = Facture::where('client_id', $client)->sum('montantFinal');
 
 
         $rembourssements = Rembourssement::all();
@@ -141,7 +141,7 @@ class ClientController extends Controller
             $rembourssement->mode = "Remboursement";
             $rembourssement->montant = $request->rembourssement;
             $rembourssement->facture_id = $request->factureId;
-            $rembourssement->client = $request->ClientId;
+            $rembourssement->client_id = $request->ClientId;
 
                // dd($rembourssement);
             $rembourssement->save();
@@ -211,9 +211,9 @@ class ClientController extends Controller
 
         try {
            //Tout les Remboursement d'un client
-            $remboursementss = Rembourssement::where('client', $clientId)->get();
+            $remboursementss = Rembourssement::where('client_id', $clientId)->get();
 
-            $factures = Facture::where('client', $clientId)->get();
+            $factures = Facture::where('client_id', $clientId)->get();
             //dd($factures);
             // Créez une collection unique en fonction des colonnes code, date, client et totalHT
             $codesFacturesUniques = $factures->unique(function ($facture) {

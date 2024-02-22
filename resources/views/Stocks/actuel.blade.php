@@ -54,7 +54,7 @@
                                           gravity: "top", // Position du toast
                                           backgroundColor: "#b30000",
                                       }).showToast();
-                                  }, 10000); // 5000 millisecondes correspondent à 5 secondes
+                                  }, 43200000); // 5000 millisecondes correspondent à 5 secondes
 
                               </script>
                           @endif

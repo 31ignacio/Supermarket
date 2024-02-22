@@ -181,13 +181,14 @@ class FactureController extends Controller
         $clients = Client::all();
         $produits = Produit::all();
         //$produits = Produit::where('produitType_id', 1)->get();
-
+        //dd($produits);
         $produitTypes = ProduitType::all();
 
+        $quantiteSortieParProduit = Facture::select( 'produit', DB::raw('SUM(quantite) as total_quantite'))
+        ->groupBy( 'produit')
+        ->get();
 
-        $quantiteSortieParProduit = Facture::select('produit', DB::raw('SUM(quantite) as total_quantite'))
-            ->groupBy('produit')
-            ->get();
+            //dd($quantiteSortieParProduit);
 
         // Créez un tableau associatif pour stocker la quantité de sortie par produit
         $quantiteSortieParProduitArray = [];
@@ -200,10 +201,14 @@ class FactureController extends Controller
             if (isset($quantiteSortieParProduitArray[$produit->libelle])) {
                 $stockActuel = $produit->quantite - $quantiteSortieParProduitArray[$produit->libelle];
                 $produit->stock_actuel = $stockActuel;
+               //dd($stockActuel);
             } else {
                 // Si la quantité de sortie n'est pas définie, le stock actuel est égal à la quantité totale
                 $produit->stock_actuel = $produit->quantite;
+                //dd($produit);
             }
+            //$produit= $produit->quantite;
+            //dd($produits);
         }
         return view('Factures.create', compact('clients', 'emplacements','produits','produitTypes'));
     }
@@ -217,6 +222,7 @@ class FactureController extends Controller
             $donnees = json_decode($request->input('donnees'));
             //dd($donnees);
             $client = $request->client;
+            //dd($client);
             $dateString = $request->date;
             $totalHT = $request->totalHT;
             $totalTVA = $request->totalTVA;

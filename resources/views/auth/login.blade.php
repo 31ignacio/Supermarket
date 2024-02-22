@@ -101,13 +101,42 @@
                 @enderror
 
 
-            <input type="password" name="password" class="login-input" placeholder="Mot de passe">
-            @error('password')
-            <div class="error_span" style="color: red";>{{ $message }}</div>
-            @enderror
+                <div class="d-flex justify-content-center">
+                  <div class="mb-3 position-relative">
+                      <input type="password" name="password" id="password"
+                          class="login-input email form-control styled-password" placeholder="Mot de passe" />
+                      <label for="showPasswordCheckbox" class="show-password-label">
+                          <input type="checkbox" id="showPasswordCheckbox" class="show-password-checkbox"
+                              onchange="togglePasswordVisibility()">
+                          Afficher le mot de
+                          passe
+                      </label>
+                  </div>
+              </div>
+  
+              @error('password')
+                  <div class="error_span" style="color: red;">{{ $message }}</div>
+              @enderror
+  
+              <br>
             <button type="submit" class="login-button">Se connecter</button>
         </form>
     </div>    
+
+
+    <script>
+      function togglePasswordVisibility() {
+          var passwordInput = document.getElementById('password');
+          var showPasswordCheckbox = document.getElementById('showPasswordCheckbox');
+
+          if (showPasswordCheckbox.checked) {
+              passwordInput.type = 'text';
+          } else {
+              passwordInput.type = 'password';
+          }
+      }
+  </script>
+
 </body>
 
 </html>

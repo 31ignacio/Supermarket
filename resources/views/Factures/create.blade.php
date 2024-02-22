@@ -20,8 +20,16 @@
 
                     <div class="form-group">
                         <label>Clients</label>
-                        <input type="text" id="client" class="form-control" style="width: 100%;border-radius:10px;">
+                        {{-- <input type="text" id="client" class="form-control" style="width: 100%;border-radius:10px;"> --}}
 
+                        <select class="form-control select2" id="client" style="width: 100%;border-radius:10px;">
+                            <option></option>
+
+                            @foreach ($clients as $client)
+                                <option value="{{ $client->id }}">{{ $client->nom }} {{ $client->prenom }}</option>
+                            @endforeach
+
+                        </select>
                     </div><!-- /input-group -->
                 </div>
 
@@ -48,21 +56,21 @@
 
 
                     <div class="mb-3 col-md-3">
-                        <label for="produit">Produits</label>
+                        <label for="produit">Produitbdhhdhdhdhs</label>
                         <select class="form-control select2" id="produit" style="width: 100%;border-radius:10px;">
                             <option></option>
-                            @foreach ($produits as $produit)
-                                <option value="{{ $produit->libelle }}" data-produitType="{{ $produit->produitType_id }}"
-                                    data-prix="{{ $produit->prix }}" data-stock="{{ $produit->stock_actuel }}">
-                                    {{ $produit->libelle }}
+
+                            {{-- @foreach ($produits as $produit)
+                                <option value="{{ $produit->stock_actuel }}" data-produitType="{{ $produit->produitType_id }}"
+                                    data-prix="{{ $produit->prix }}" data-stock="{{$produit->stock_actuel}}">
+                                    {{ $produit->stock_actuel }}
                                 </option>
-                            @endforeach
+                            @endforeach --}}
                         </select>
 
 
                     </div>
 
-                    <div id="message" style="color: red;"></div>
 
                     <br>
 
@@ -72,8 +80,10 @@
                         <label for="quantite">Quantité</label>
                         <input type="number" value="0" min=0 class="form-control" id='quantite'
                             style="width: 100%;border-radius:10px;">
+                            <div id="message" style="color: red;"></div>
 
                     </div>
+
                     <br><br><br>
 
 
@@ -234,6 +244,7 @@
             //var quantite = document.getElementById("quantite").value;
             //var quantite = parseFloat(document.getElementById("quantite").value);
             var quantite = document.getElementById("quantite").value;
+            
             // var produit = document.getElementById("produit").value;
             // var selectProduit = $('#produit');
             //alert(quantite);
@@ -342,6 +353,8 @@
             var montantPercu = parseFloat(document.getElementById("montantPaye").value);
             var remise = document.getElementById("remise").value;
             //alert(remise)
+            //var stock = parseFloat(selectedOption.getAttribute("data-stock"));
+            //alert(stock)
 
             var totalTTC = document.getElementById('totalTTC').innerText;
 
@@ -526,9 +539,12 @@
 
         function validateQuantite() {
             var selectedOption = produitSelect.options[produitSelect.selectedIndex];
+            
             var stock = parseFloat(selectedOption.getAttribute("data-stock"));
+            //var stock=10;
+            
             var quantite = parseFloat(quantiteInput.value);
-
+            console.log(produitSelect,selectedOption,stock,quantite)
             if (isNaN(quantite) || isNaN(stock) || quantite <= stock) {
                 message.textContent = "";
                 quantiteInput.style.borderColor = "";
@@ -539,7 +555,7 @@
                 // Efface le champ de quantité après 3 secondes
                 setTimeout(function() {
                     quantiteInput.value = "";
-                }, 3000);
+                }, 2000);
             }
 
             // Vérifiez si l'utilisateur a changé de produit
@@ -596,6 +612,7 @@
                     var option = document.createElement('option');
                     option.value = "{{ $produit->libelle }}";
                     option.setAttribute('data-prix', "{{ $produit->prix }}");
+                    option.setAttribute('data-stock', "{{ $produit->stock_actuel }}");
                     option.textContent = "{{ $produit->libelle }}";
                     produitsSelect.appendChild(option);
                 }

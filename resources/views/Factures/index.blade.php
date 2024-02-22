@@ -81,19 +81,19 @@
                                                             @endif
                                                         @endauth
                                                         <td>
-                                                            <a href="{{ route('facture.details', ['code' => $factureUnique->code, 'date' => $factureUnique->date]) }}"
-                                                                class="btn-sm btn-primary">Détail</a>
-
-                                                            @auth
-                                                                @if (auth()->user()->role_id === 1)
-
-                                                                    <a href="#" class="btn-sm btn-danger" data-toggle="modal"
-                                                                        data-target="#confirmationModal"
-                                                                        onclick="updateModal('{{ $factureUnique->code }}')">Annuler</a>
-
-                                                                @endif
-                                                            @endauth
+                                                            <div class="d-flex flex-column flex-sm-row"> <!-- Utiliser la classe flexbox -->
+                                                                <a href="{{ route('facture.details', ['code' => $factureUnique->code, 'date' => $factureUnique->date]) }}"
+                                                                    class="btn-sm btn-primary mb-2 mb-sm-0 mr-sm-2">Détail</a> <!-- Ajouter des marges et des classes de grille -->
+                                                        
+                                                                @auth
+                                                                    @if (auth()->user()->role_id === 1)
+                                                                        <a href="#" class="btn-sm btn-danger" data-toggle="modal" data-target="#confirmationModal"
+                                                                            onclick="updateModal('{{ $factureUnique->code }}')">Annuler</a>
+                                                                    @endif
+                                                                @endauth
+                                                            </div>
                                                         </td>
+                                                        
                                                     </tr>
                                             
                                         @elseif($nom === $factureUnique->user->name)

@@ -55,11 +55,11 @@
                   <td>{{ $client->ville }}</td>
 
                   <td>
-                    <!-- <a href="{{ route('client.detail', ['client' => $client->id]) }}" class="btn-sm btn-primary"><i class="fas fa-eye"></i></a> -->
+                    <a href="{{ route('client.detail', ['client' => $client->id]) }}" class="btn-sm btn-primary"><i class="fas fa-eye"></i></a>
                     <a class="btn-sm btn-warning" href="{{ route('client.edit', $client->id) }}"><i class="fas fa-edit"></i></a>
 
                     @auth
-                    @if(auth()->user()->role_id === 1)
+                    @if(auth()->user()->role_id == 1)
                    
                     <a class="btn-sm btn-danger" href="{{ route('client.delete', $client->id) }}"><i class="fas fa-trash-alt"></i></a>
                  

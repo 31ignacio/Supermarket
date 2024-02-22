@@ -8,7 +8,7 @@
                 <div class="col-md-10">
                 @foreach ($produits as $produit)
 
-                    @if($produit->produitType_id ===1)
+                    @if($produit->produitType_id ==1)
 
                     <a href="{{ route('produit.index') }}" class="btn  bg-gradient-primary">Retour</a><br><br>
                     
