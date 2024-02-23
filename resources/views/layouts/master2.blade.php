@@ -268,16 +268,16 @@
                                 <li class="nav-item">
                                     <a href="{{ route('produit.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Produits en détails</p>
+                                        <p>Liste des produits</p>
                                     </a>
                                 </li>
 
-                                <li class="nav-item">
+                                {{-- <li class="nav-item">
                                     <a href="{{ route('produit.index2') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Produits en gros</p>
                                     </a>
-                                </li>
+                                </li> --}}
 
 
 

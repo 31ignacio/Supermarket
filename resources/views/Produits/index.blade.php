@@ -28,7 +28,7 @@
           
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">Liste des produits en détails</h3>
+              <h3 class="card-title">Liste des produits</h3>
             </div>
             <!-- /.card-header -->
             <div class="card-body">
@@ -37,7 +37,7 @@
                 <tr>
                   <th>Code</th>
                   <th>Produits</th>
-                  {{-- <th>Quantités</th> --}}
+                  <th>Types</th>
                   <th>Emplacements</th>
                   <th>Actions</th>
 
@@ -49,7 +49,15 @@
                 <tr>
                   <td>{{ $produit->code }}</td>
                   <td>{{ $produit->libelle }}</td>
-                  {{-- <td>{{ $produit->quantite }}</td> --}}
+                  <td>
+                    @if($produit->produitType_id == 1)
+                              
+                    <span class="badge badge-success">Détails</span>
+                    @else
+                          <span class="badge badge-primary">Gros</span>
+                    @endif
+                  
+                  </td>
                   <td>{{ $produit->emplacement->nom}}</td>
 
                   <td>

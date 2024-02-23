@@ -13,7 +13,7 @@
                     <a href="{{ route('produit.index') }}" class="btn  bg-gradient-primary">Retour</a><br><br>
                     
                     @else
-                    <a href="{{ route('produit.index2') }}" class="btn  bg-gradient-primary">Retour</a><br><br>
+                    <a href="{{ route('produit.index') }}" class="btn  bg-gradient-primary">Retour</a><br><br>
 
                     @endif
                 @endforeach

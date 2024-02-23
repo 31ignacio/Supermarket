@@ -20,14 +20,15 @@ class ProduitController extends Controller
     //
     public function index()
     {
-        //$produits = Produit::all();
-        $produits = Produit::all()->filter(function ($produit) {
-            return $produit->produitType_id == 1;
-        });
+        $produits = Produit::all();
+        // $produits = Produit::all()->filter(function ($produit) {
+        //     return $produit->produitType_id == 1;
+        // });
 
-        $produitsGros = Produit::all()->filter(function ($produit) {
-            return $produit->produitType_id == 2;
-        });
+            // Liste des gros filtré en gros
+        // $produitsGros = Produit::all()->filter(function ($produit) {
+        //     return $produit->produitType_id == 2;
+        // });
 
         //dd($produits,$produitsGros);
       
@@ -36,6 +37,7 @@ class ProduitController extends Controller
         return view('Produits.index',compact('produits'));
     }
 
+    // listte des produits filtré en gros
     public function index2()
     {
        
