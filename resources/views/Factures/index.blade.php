@@ -63,7 +63,7 @@
                                                         @if ($factureUnique->client === null)
                                                             <td>Client</td>
                                                         @else
-                                                            <td>{{ $factureUnique->client }}</td>
+                                                            <td>{{ $factureUnique->client_nom }}</td>
                                                         @endif
 
                                                         <td>{{ date('d/m/Y', strtotime($factureUnique->date)) }}</td>

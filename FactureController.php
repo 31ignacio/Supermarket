@@ -8,9 +8,9 @@ use App\Models\Emplacement;
 use App\Models\information;
 use App\Models\ModePaiement;
 use App\Models\Produit;
-use App\Models\ProduitType;
 use App\Models\grosProduit;
 
+use App\Models\ProduitType;
 use DateTime; // Importez la classe DateTime en haut de votre fichier
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,7 +41,7 @@ class FactureController extends Controller
         $role=$user->role_id;
         //dd($role);
 
-        // Récupérer la somme du montantFinal pour l'utilisateur connecté et le rôle donné
+        // Recuperer la somme du montantFinal pour l'utilisateur connecte et le rôle donne
         $sommeMontant = Facture::where('user_id', $user->id)
             // ->where('role_id', $role)
             ->whereDate('date', now()) // Filtre pour la date du jour
@@ -50,15 +50,17 @@ class FactureController extends Controller
             //dd($sommeMontant);
 
         $factures = Facture::all();
-       
+        $client = Client::all();
+
+        // Creez une collection unique en fonction des colonnes code, date, client et totalHT
         $codesFacturesUniques = $factures
         ->unique(function ($facture) {
             return $facture->code . $facture->date . $facture->client . $facture->totalHT . $facture->emplacement;
         })
         ->sortByDesc('created_at');
+       // dd($codesFacturesUniques);
 
-
-        // Paginer les résultats obtenus
+        // Paginer les resultats obtenus
         $perPage = 10;
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
         $currentPageItems = $codesFacturesUniques->slice(($currentPage - 1) * $perPage, $perPage)->all();
@@ -73,8 +75,8 @@ class FactureController extends Controller
         );
             
 
-        $factures = Facture::orderBy('code')->get()->groupBy('code');
-       // dd($codesFacturesUniques);
+        //$factures = Facture::orderBy('code')->get()->groupBy('code');
+       //dd($codesFacturesUniques);
         return view('Factures.index', compact('factures', 'codesFacturesUniques','nom','role'));
     }
 
@@ -93,7 +95,7 @@ class FactureController extends Controller
        $user_id = $user->id;
 
        // Si l'utilisateur a le rôle avec role_id=2
-       if ($role_id === 2 or $role_id === 3) {
+       if ($role_id == 2 or $role_id == 3) {
            // Récupérer la somme du montantFinal pour le rôle avec role_id=2 et user_id de l'utilisateur connecté
             $sommeMontant = Facture::where('user_id', $user_id)
                ->whereDate('date', now()) // Filtre pour la date du jour
@@ -152,7 +154,7 @@ class FactureController extends Controller
         //dd($request,$factures);
         foreach ($factures as $facture) {
             //c'est la tu feras le jeu
-            $produit = Produit::where('libelle', $facture->produit)->first();
+            $produit = grosProduit::where('libelle', $facture->produit)->first();
 
             if ($produit) {
                 $nouvelleQuantite = $produit->quantite + $facture->quantite - $facture->quantite; // Mettez à jour la nouvelle quantité
@@ -177,15 +179,15 @@ class FactureController extends Controller
         $emplacements = Emplacement::all();
         $clients = Client::all();
         $produits = grosProduit::all();
+        //dd($clients);
         //$produits = Produit::where('produitType_id', 1)->get();
-        //dd($produits);
+
         $produitTypes = ProduitType::all();
 
-        $quantiteSortieParProduit = Facture::select( 'produit', DB::raw('SUM(quantite) as total_quantite'))
-        ->groupBy( 'produit')
-        ->get();
 
-            //dd($quantiteSortieParProduit);
+        $quantiteSortieParProduit = Facture::select('produit', DB::raw('SUM(quantite) as total_quantite'))
+            ->groupBy('produit')
+            ->get();
 
         // Créez un tableau associatif pour stocker la quantité de sortie par produit
         $quantiteSortieParProduitArray = [];
@@ -198,15 +200,12 @@ class FactureController extends Controller
             if (isset($quantiteSortieParProduitArray[$produit->libelle])) {
                 $stockActuel = $produit->quantite - $quantiteSortieParProduitArray[$produit->libelle];
                 $produit->stock_actuel = $stockActuel;
-               //dd($stockActuel);
             } else {
                 // Si la quantité de sortie n'est pas définie, le stock actuel est égal à la quantité totale
                 $produit->stock_actuel = $produit->quantite;
-                //dd($produit);
             }
-            //$produit= $produit->quantite;
-            //dd($produits);
         }
+       // dd($produits);
         return view('Factures.create', compact('clients', 'emplacements','produits','produitTypes'));
     }
 
@@ -222,7 +221,6 @@ class FactureController extends Controller
             $parts = explode(' ', $client_id);
             $client_id = $parts[0]; // Contient "2"
             $client_nom = $parts[1]; // Contient "zz"
-            //dd($id, $nom);
             $dateString = $request->date;
             $totalHT = $request->totalHT;
             $totalTVA = $request->totalTVA;
@@ -232,31 +230,30 @@ class FactureController extends Controller
             $montantFinal = $request->montantFinal;
 
             $produitType = $request->produitType;
-            // Récupère l'utilisateur connecté
+            // Recupere l'utilisateur connecte
             $user = Auth::user();
-            //dump($user);
+            //dd($produitType, $client);
             
-            // Vous pouvez accéder aux propriétés de l'utilisateur, par exemple :
+            // Vous pouvez acceder aux proprietes de l'utilisateur, par exemple :
             $idUser = $user->id;
             
             $prefix = 'Fact_';
             $nombreAleatoire = rand(0, 10000); // Utilisation de rand()
 
-            // Formatage du nouveau matricule avec la partie numérique
+            // Formatage du nouveau matricule avec la partie numerique
             $code = $prefix . $nombreAleatoire;
 
             // Convertissez la date en un objet DateTime
             $date = new DateTime($dateString);
             try {
-                // Parcourez chaque élément de $donnees et enregistrez-les dans la base de données
+                // Parcourez chaque element de $donnees et enregistrez-les dans la base de donnees
                 foreach ($donnees as $donnee) {
-                    // Créez une nouvelle instance du modèle Facture pour chaque élément
+                    // Creez une nouvelle instance du modele Facture pour chaque element
                     $facture = new Facture();
 
                     // Remplissez les propriétés du modèle avec les données
                     $facture->client = $client_id; 
                     $facture->client_nom = $client_nom; 
-
                     $facture->date = $date;
                     $facture->produitType_id = $produitType;
                     $facture->totalHT = $totalHT;

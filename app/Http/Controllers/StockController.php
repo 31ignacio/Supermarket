@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Facture;
 use App\Models\Produit;
 use App\Models\Stock;
+use App\Models\grosProduit;
+
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -31,7 +33,7 @@ class StockController extends Controller
     public function create()
     {
         //$produits = Produit::all();
-        $produits = Produit::where('produitType_id', 1)->get();
+        $produits = grProduit::where('produitType_id', 1)->get();
 
 
         return view('Stocks.create', compact('produits'));
@@ -71,11 +73,11 @@ class StockController extends Controller
         // dd($factures);
 
         $factures = Facture::select('date', 'produit', DB::raw('SUM(quantite) as total_quantite'))
-    ->where('produitType_id', 1)
-    ->groupBy('date', 'produit')
-    ->orderBy('date', 'asc')
-    ->get();
-    //dd($factures);
+        ->where('produitType_id', 1)
+        ->groupBy('date', 'produit')
+        ->orderBy('date', 'asc')
+        ->get();
+        //dd($factures);
 
 
         return view('Stocks.sortie', compact('factures'));
@@ -88,10 +90,10 @@ class StockController extends Controller
         // dd($factures);
 
         $factures = Facture::select('date', 'produit', DB::raw('SUM(quantite) as total_quantite'))
-    ->where('produitType_id', 2)
-    ->groupBy('date', 'produit')
-    ->orderBy('date', 'asc')
-    ->get();
+        ->where('produitType_id', 2)
+        ->groupBy('date', 'produit')
+        ->orderBy('date', 'asc')
+        ->get();
 
 
         return view('Stocks.sortieGros', compact('factures'));
@@ -100,12 +102,17 @@ class StockController extends Controller
 
     public function actuel()
     {
+        //dd(10);
         // $produits = Produit::all();
 
         // $produits = Produit::all()->filter(function ($produit) {
         //     return $produit->produitType_id == 1;
         // });
-        $produits = Produit::where('produitType_id', 1)->get();
+        //affiche seulement les produits en détails
+        // $produits = Produit::where('produitType_id', 1)->get();
+
+        //Affiche tout les gros de la table grosProduit
+        $produits = grosProduit::all();
 
         // $quantiteSortieParProduit = Facture::select('produit', DB::raw('SUM(quantite) as total_quantite'))
         //     ->groupBy('produit')
@@ -281,19 +288,13 @@ class StockController extends Controller
             return back()->with('success_message', "La quantité actuelle du produit est inférieure à la quantité que vous souhaitez transférer.");
         } else {
 
-
-
-
-
-            $produits = Produit::all()->filter(function ($produit) {
-                return $produit->produitType_id == 1;
+            $produits = grosProduit::all()->filter(function ($produit) {
+                return $produit->produitType_id == 2;
             });
 
-
-
             //recupere le produit en detail qui a ce libelle
-            $produitss = Produit::all()->filter(function ($produit) use ($libelle) {
-                return $produit->produitType_id == 1 && $produit->libelle == $libelle;
+            $produitss = grosProduit::all()->filter(function ($produit) use ($libelle) {
+                return $produit->produitType_id == 2 && $produit->libelle == $libelle;
             });
             //dd($produitss);
             if ($produitss->isEmpty()) {

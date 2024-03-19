@@ -37,7 +37,7 @@
                   @if($facture->client=== Null)
                   <strong>Client: Client</strong><br>
                   @else
-                  <strong>Client : {{$facture->client}}</strong><br>
+                  <strong>Client : {{$facture->client_nom}}</strong><br>
                   @endif
 
                 {{-- N° Ifu :  {{$facture->client->ifu}}<br> --}}

@@ -8,6 +8,7 @@ use App\Models\ProduitType;
 use App\Models\Categories;
 use App\Models\Emplacement;
 use App\Models\Fournisseur;
+use App\Models\grosProduit;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Carbon\Carbon;
@@ -64,7 +65,7 @@ class ProduitController extends Controller
         return view('Produits.create',compact('categories','emplacements','fournisseurs','produitTypes'));
     }
 
-    public function store(Produit $produit, Request $request)
+    public function store(Produit $produit, grosProduit $grosproduit, Request $request)
     {
        $nombreAleatoire = rand(0, 1000); // Utilisation de rand()
        $codeTroisPremiereLettre= substr($request->libelle, 0, 3);
@@ -82,12 +83,24 @@ class ProduitController extends Controller
             $produit->emplacement_id = $request->emplacement;
             $produit->libelle = $request->libelle;
             $produit->prix = $request->prix;
-
             $produit->produitType_id=$request->produitType;
-           // dd($request->produitType);
             $produit->quantite = $request->quantite;
             $produit->dateExpiration = $request->dateExpiration;
             $produit->dateReception = $request->dateReception;
+
+            // deuxieme table
+            //25/02/2024
+            $grosproduit->code = $code;
+            $grosproduit->categorie_id = $request->categorie;
+            $grosproduit->fournisseur_id = $request->fournisseur;
+            $grosproduit->emplacement_id = $request->emplacement;
+            $grosproduit->libelle = $request->libelle;
+            $grosproduit->prix = $request->prix;
+            $grosproduit->produitType_id=$request->produitType;
+            $grosproduit->quantite = $request->quantite;
+            $grosproduit->dateExpiration = $request->dateExpiration;
+            $grosproduit->dateReception = $request->dateReception;
+
 
             if($request->categorie=="" || $request->fournisseur=="" || $request->emplacement=="" || $request->produitType==""){
 
@@ -96,13 +109,18 @@ class ProduitController extends Controller
 
             //dd($produit);
             $produit->save();
+            // $grosproduit->save();
 
             if($request->produitType == 1){
+                $grosproduit->save();//25/02/2024
 
                 return redirect()->route('produit.index')->with('success_message', 'Produit enregistré avec succès');
 
             }else{
-                return redirect()->route('produit.index2')->with('success_message', 'Produit enregistré avec succès');
+                $grosproduit->quantite = 0;//25/02/2024
+                $grosproduit->save();//25/02/2024
+
+                return redirect()->route('produit.index')->with('success_message', 'Produit enregistré avec succès');
 
             }
 

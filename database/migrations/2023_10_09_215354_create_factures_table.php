@@ -27,6 +27,7 @@ return new class extends Migration
             $table->integer('montantRendu')->nullable();
             $table->integer('montantFinal')->nullable();
             $table->text('client')->nullable();
+            $table->text('client_nom')->nullable();
 
             $table->unsignedBigInteger('produitType_id');
             $table->foreign('produitType_id')->references('id')->on('produit_types')->onDelete('cascade');

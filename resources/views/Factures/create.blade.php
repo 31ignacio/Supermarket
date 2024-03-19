@@ -24,11 +24,11 @@
 
                         <select class="form-control select2" id="client" style="width: 100%;border-radius:10px;">
                             <option></option>
-
+                        
                             @foreach ($clients as $client)
-                                <option value="{{ $client->id }}">{{ $client->nom }} {{ $client->prenom }}</option>
+                                <option value="{{ $client->id }} {{ $client->nom}}" @if ($client->nom === 'Client') selected @endif>{{ $client->nom }} {{ $client->prenom }}</option>
                             @endforeach
-
+                        
                         </select>
                     </div><!-- /input-group -->
                 </div>
@@ -48,24 +48,16 @@
 
             </div>
 
-
-
             <form id="monFormulaire">
                 <div id="msg25"></div>
                 <div class="row">
 
-
+                    {{-- Les produits sont chargé depuis le js en bas --}}
                     <div class="mb-3 col-md-3">
-                        <label for="produit">Produitbdhhdhdhdhs</label>
+                        <label for="produit">Produits</label>
                         <select class="form-control select2" id="produit" style="width: 100%;border-radius:10px;">
                             <option></option>
-
-                            {{-- @foreach ($produits as $produit)
-                                <option value="{{ $produit->stock_actuel }}" data-produitType="{{ $produit->produitType_id }}"
-                                    data-prix="{{ $produit->prix }}" data-stock="{{$produit->stock_actuel}}">
-                                    {{ $produit->stock_actuel }}
-                                </option>
-                            @endforeach --}}
+                            
                         </select>
 
 
@@ -80,10 +72,11 @@
                         <label for="quantite">Quantité</label>
                         <input type="number" value="0" min=0 class="form-control" id='quantite'
                             style="width: 100%;border-radius:10px;">
-                            <div id="message" style="color: red;"></div>
+
+                            <div id="messagePro" style="color: red;"></div>
+
 
                     </div>
-
                     <br><br><br>
 
 
@@ -244,11 +237,12 @@
             //var quantite = document.getElementById("quantite").value;
             //var quantite = parseFloat(document.getElementById("quantite").value);
             var quantite = document.getElementById("quantite").value;
-            
             // var produit = document.getElementById("produit").value;
             // var selectProduit = $('#produit');
             //alert(quantite);
             var produit = document.getElementById("produit").value;
+            var client = document.getElementById("client").value;
+
             //var prix = $("option:selected", this).data("prix");
             // Sélectionnez l'élément de liste déroulante par son ID
             var selectProduit = $('#produit');
@@ -258,10 +252,10 @@
 
             //alert(prix)
 
-            if (quantite.trim() === "" || isNaN(parseFloat(quantite)) || produit.trim() === "") {
+            if (quantite.trim() == "" || isNaN(parseFloat(quantite)) || produit.trim() == ""  || client.trim() == "") {
         // Ajoutez ici le code pour afficher un message d'erreur ou faites une action appropriée
         $('#msg25').html(`<p class="text-danger">
-                            <strong>Veuillez remplir tous les champs (quantité, produit) avec des valeurs valides.</strong>
+                            <strong>Veuillez remplir tous les champs (quantité, produit,client) avec des valeurs valides.</strong>
                         </p>`);
         // Masquer le message après 3 secondes
         setTimeout(function() {
@@ -353,15 +347,13 @@
             var montantPercu = parseFloat(document.getElementById("montantPaye").value);
             var remise = document.getElementById("remise").value;
             //alert(remise)
-            //var stock = parseFloat(selectedOption.getAttribute("data-stock"));
-            //alert(stock)
 
             var totalTTC = document.getElementById('totalTTC').innerText;
 
             //alert(totalTTC)
             var montantRendu = 0;
 
-            if (montantPercu === "" || totalTTC === 0) {
+            if (montantPercu == "" || totalTTC == 0) {
                 // Ajoutez ici le code pour afficher un message d'erreur ou faites une action appropriée
                 $('#msg30').html(` <p  class="text-danger">
                         <strong>Veuillez remplir tous les champs.</strong>
@@ -412,7 +404,7 @@
           //  alert(montantPaye)
             //alert(totalTTC)
 
-            if (produitType === "") {
+            if (produitType == "") {
                 $('#msg30').html(`
         <p class="text-danger">
             <strong>Veuillez remplir tous les champs obligatoires.</strong>
@@ -421,7 +413,7 @@
                 // Masquer le message après 3 secondes
                 setTimeout(function() {
                     $('#msg30').html('');
-                }, 3000);
+                }, 2000);
 
         //        if (montantPaye < totalTTC) {
         // // Afficher un message d'erreur si le montant payé est inférieur au total TTC
@@ -437,7 +429,7 @@
         //     $('#msg30').html('');
         // }, 5000);
 
-        } else if (montantPaye === "") {
+        } else if (montantPaye == "") {
             // Afficher un message d'erreur si le montant payé est vide
             $('#msg30').html(`
                 <p class="text-danger">
@@ -525,7 +517,7 @@
     <script>
         var quantiteInput = document.getElementById("quantite");
         var produitSelect = document.getElementById("produit");
-        var message = document.getElementById("message");
+        var message = document.getElementById("messagePro");
         var previousValue = quantiteInput.value;
         var previousSelectedIndex = produitSelect.selectedIndex;
 
@@ -539,12 +531,9 @@
 
         function validateQuantite() {
             var selectedOption = produitSelect.options[produitSelect.selectedIndex];
-            
             var stock = parseFloat(selectedOption.getAttribute("data-stock"));
-            //var stock=10;
-            
             var quantite = parseFloat(quantiteInput.value);
-            console.log(produitSelect,selectedOption,stock,quantite)
+
             if (isNaN(quantite) || isNaN(stock) || quantite <= stock) {
                 message.textContent = "";
                 quantiteInput.style.borderColor = "";
@@ -555,7 +544,7 @@
                 // Efface le champ de quantité après 3 secondes
                 setTimeout(function() {
                     quantiteInput.value = "";
-                }, 2000);
+                }, 3000);
             }
 
             // Vérifiez si l'utilisateur a changé de produit
@@ -582,15 +571,16 @@
         var annee = dateActuelle.getFullYear();
         var mois = ('0' + (dateActuelle.getMonth() + 1)).slice(-2);
         var jour = ('0' + dateActuelle.getDate()).slice(-2);
-
+    
         // Formater la date pour l'attribut value de l'input
         var dateAujourdhui = annee + '-' + mois + '-' + jour;
-
-        // Définir la valeur et la propriété min de l'input
+    
+        // Définir la valeur et la propriété max de l'input
         var inputDate = document.getElementById('date');
         inputDate.value = dateAujourdhui;
-        inputDate.min = dateAujourdhui;
+        inputDate.max = dateAujourdhui;
     </script>
+    
 
     <!-- JavaScript pour la mise à jour dynamique (Produit type et produit) -->
     <script>
@@ -613,6 +603,7 @@
                     option.value = "{{ $produit->libelle }}";
                     option.setAttribute('data-prix', "{{ $produit->prix }}");
                     option.setAttribute('data-stock', "{{ $produit->stock_actuel }}");
+
                     option.textContent = "{{ $produit->libelle }}";
                     produitsSelect.appendChild(option);
                 }

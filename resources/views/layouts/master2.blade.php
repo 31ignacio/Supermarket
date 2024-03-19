@@ -262,7 +262,7 @@
                                     <a href="{{ route('produit.create') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Ajouter un produit</p>
-                 wsq<Q<q<Q<q<Q<<Q<<<Q<x                   </a>
+                                    </a>
                                 </li>
 
                                 <li class="nav-item">
